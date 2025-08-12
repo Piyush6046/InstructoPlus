@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import logo from '../assets/logo.jpg'
 import google from '../assets/google.jpg'
-// import axios from 'axios'
-// import { serverUrl } from '../App'
+import axios from 'axios'
+import { serverUrl } from '../App'
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 
 import { MdRemoveRedEye } from "react-icons/md";
@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom'
 // import { signInWithPopup } from 'firebase/auth'
 // import { auth, provider } from '../../utils/Firebase'
 import { ClipLoader } from 'react-spinners'
-// import { toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 // import { useDispatch } from 'react-redux'
 // import { setUserData } from '../redux/userSlice'
 
@@ -24,19 +24,30 @@ function Login() {
     const [loading,setLoading]= useState(false)
     // let dispatch = useDispatch()
 
-    const handleSignUp = async(e)=>{
-        e.preventDefault()
-        setLoading(true)
-        // try {
-        //     let res = await axios.post(`${serverUrl}/auth/signup`,{name,email,password,role})
-        //     dispatch(setUserData(res.data))
-        //     setLoading(false)
-        //     navigate('/')
-        // } catch (error) {
-        //     setLoading(false)
-        //     toast.error(error.response.data.message)
-        // }
+      const handleLogin = async (e) => {
+    try {
+      setLoading(true);
+      const result = await axios.post(
+        serverUrl + "/api/auth/login",
+        {email, password },
+        { withCredentials: true }
+      );
+      console.log(result);
+      setLoading(false);
+      toast.success("login successfully");
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+
+    } catch (error) {
+      console.log("error in handle login", error);
+      toast.error(error.response.data.message);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+      setLoading(true);
     }
+  };
   return (
     <div className='bg-[#dddbdb] w-[100vw] h-[100vh] flex items-center justify-center flex-col gap-3'>
         <form className='w-[90%] md:w-200 h-150 bg-[white] shadow-xl rounded-2xl flex' onSubmit={(e)=>e.preventDefault()}>
@@ -59,7 +70,7 @@ function Login() {
                     {!show && <MdOutlineRemoveRedEye className='absolute w-[20px] h-[20px] cursor-pointer right-[5%] bottom-[10%]' onClick={()=>setShow(prev => !prev)}/>}
               {show && <MdRemoveRedEye className='absolute w-[20px] h-[20px] cursor-pointer right-[5%] bottom-[10%]' onClick={()=>setShow(prev => !prev)} />}
                 </div>
-                <button className='w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]' disabled={loading} onClick={handleSignUp}>{loading?<ClipLoader size={30} color='white' /> : "Login Up"}</button>
+                <button className='w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]' disabled={loading} onClick={handleLogin}>{loading?<ClipLoader size={30} color='white' /> : "Login Up"}</button>
 
 
 {/* forgot password */}
