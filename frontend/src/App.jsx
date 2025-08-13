@@ -6,12 +6,11 @@ import Login from './pages/Login'
 export const serverUrl = "http://localhost:8000"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import getCurrentUser from './customHooks/getCurrentUser.js'
-import { store } from './redux/store.js'
+import useGetCurrentUser from './customHooks/getCurrentUser.js'
 
 function App() {
-  getCurrentUser();
-  console.log("current user data", JSON.stringify(store.getState().user));
+  useGetCurrentUser(); // Using the hook properly inside the component
+  
   return (
     <>
       <Routes>
