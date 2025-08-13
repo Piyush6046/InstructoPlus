@@ -19,6 +19,9 @@ const port = process.env.PORT || 8080;
 
 app.use("/api/auth",authRouter);
 app.use("/api/user",userRouter);
+
+
+
 app.get("/", (req, res) => {
   res.send("Hello from backend");
 })
