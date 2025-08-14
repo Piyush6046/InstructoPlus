@@ -4,10 +4,10 @@ import google from '../assets/google.jpg'
 import axios from 'axios'
 import { serverUrl } from '../App'
 import { MdOutlineRemoveRedEye } from "react-icons/md";
-
+import { signInWithPopup } from 'firebase/auth'
 import { MdRemoveRedEye } from "react-icons/md";
 import { useNavigate } from 'react-router-dom'
-
+import { auth, provider } from '../../utils/firebase.js'
 import { ClipLoader } from 'react-spinners'
 import { toast } from 'react-toastify'
 import { useDispatch } from 'react-redux'
@@ -43,11 +43,17 @@ function SignUp() {
             const response = await signInWithPopup(auth,provider)
             console.log(response)
             let user = response.user
-            let name = user.displayName;
-            let email=user.email
+            let Gname = user.displayName;
+            let Gemail = user.email
+            let photourl= user.photoURL
+            console.log(Gname,Gemail,photourl);
 
+            if(!Gname || !Gemail){
+                toast.error("User validation failed: name and email are required.")
+                return
+            }
 
-            const result = await axios.post(serverUrl + "/api/auth/googlesignup" , {name , email ,role}
+            const result = await axios.post(serverUrl + "/api/auth/googleAuth" , {name: Gname, email: Gemail, role, photo: photourl}
                 , {withCredentials:true}
             )
             dispatch(setUserData(result.data))
@@ -57,7 +63,6 @@ function SignUp() {
             console.log(error)
             toast.error(error.response.data.message)
         }
-
     }
   return (
     <div className='bg-[#dddbdb] w-[100vw] h-[100vh] flex items-center justify-center flex-col gap-3'>

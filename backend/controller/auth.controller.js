@@ -209,3 +209,36 @@ export const resetPassword =async(req,res)=>{
     })
   }
 }
+
+export const googleAuth = async (req, res) => {
+  try {
+    const { name, email, role, photo } = req.body;
+    
+    let user = await User.findOne({ email });
+    console.log(user);
+    if (!user) {
+      user = await User.create({ name, email, role, password: "defaultPassword", photoUrl: photo });
+    }
+    let token = await genToken(user._id);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    res.status(200).json({
+      success: true,
+      message: "Authenticated successfully",
+      user,
+      token,
+    });
+  } catch (error) {
+    console.log('auth error server side', error);
+    return res.status(500).json({
+      success: false,
+      message: "error while google auth",
+      error,
+    });
+  }
+}
+
