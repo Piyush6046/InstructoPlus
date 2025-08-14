@@ -7,6 +7,7 @@ import ai1 from "../assets/SearchAi.png";
 import Logos from "../components/Logos";
 
 import { useNavigate } from "react-router-dom";
+import ExploreCourses from "../components/ExploreCourses";
 function Home() {
   const navigate = useNavigate();
 
@@ -52,11 +53,7 @@ function Home() {
         </div>
       </div>
       <Logos />
-      {/* <ExploreCourses />
-      <Cardspage />
-      <About />
-      <ReviewPage />
-      <Footer /> */}
+      <ExploreCourses />
     </div>
   );
 }
