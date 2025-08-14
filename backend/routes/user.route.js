@@ -8,5 +8,6 @@ import { updateProfile } from "../controller/user.controller.js";
 const userRouter = express.Router();
 
 userRouter.get("/getcurrentuser", isAuth, getCurrentUser);
-userRouter.post("/profile",isAuth,upload.single("photoUrl"),updateProfile)
+// userRouter.post("/profile",isAuth,upload.single("photoUrl"),updateProfile)
+userRouter.post("/updateprofile",isAuth,upload.single("photoUrl"),updateProfile)
 export default userRouter;

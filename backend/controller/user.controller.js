@@ -1,4 +1,5 @@
 import User from "../model/user.Model.js";
+import uploadOnCloudinary from "../config/cloudinary.js";
 
 export const getCurrentUser = async (req, res) => {
   try {
@@ -22,32 +23,35 @@ export const getCurrentUser = async (req, res) => {
   }
 }
 
-export const updateProfile= async(req,res)=>{
+export const updateProfile = async (req, res) => {
   try {
-    const userId=req.userId
-    const{description,name}=req.body
+    const userId = req.userId;
+    const { description, name } = req.body;
     let photoUrl;
-    if(req.file){
-      photoUrl= await uploadOnCloudinary(req.file.path)
+    if (req.file) {
+      photoUrl = await uploadOnCloudinary(req.file.path);
     }
-    const user= await User.findByIdAndUpdate(userId,{description,name,photoUrl},{new:true})
-    if(!user){
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { description, name, photoUrl },
+      { new: true }
+    );
+    if (!user) {
       return res.status(400).json({
-        success:false,
-        message:"User not found"
-      })
+        success: false,
+        message: "User not found",
+      });
     }
     res.status(200).json({
-      success:true,
-      message:"Profile updated successfully",
-      user
-    })
-
+      success: true,
+      message: "Profile updated successfully",
+      user,
+    });
   } catch (error) {
     return res.status(500).json({
-      success:false,
-      message:"error while updating profile",
-      error
-    })
+      success: false,
+      message: "error while updating profile",
+      error,
+    });
   }
-}
+};
