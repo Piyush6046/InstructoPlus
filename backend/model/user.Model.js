@@ -34,7 +34,16 @@ const userSchema = new mongoose.Schema({
       ref: "Course",
     },
   ],
-
+  resetOtp: {
+    type: String,
+  },
+  otpExpiry: {
+    type: Date,
+  },
+  isOtpVerified: {
+    type: Boolean,
+    default: false,
+  },
 }, {
   timestamps: true,
 });
