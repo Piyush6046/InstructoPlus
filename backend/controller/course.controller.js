@@ -155,7 +155,7 @@ export const getCourseById = async (req, res) => {
 export const removeCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const course = await Course.findById(courseId);
+    let course = await Course.findById(courseId); // Changed const to let
     if (!course) {
       return res.status(400).json({
         success: false,
