@@ -12,8 +12,6 @@ import { setCreatorCourseData } from '../../redux/courseSlice';
 function AddCourses() {
     const navigate= useNavigate()
     const {courseId} = useParams()
-
-    
     const [selectedCourse,setSelectedCourse] = useState(null)
     const [title,setTitle] = useState("")
     const [subTitle,setSubTitle] = useState("")
@@ -28,8 +26,6 @@ function AddCourses() {
    let [loading,setLoading] = useState(false)
    const dispatch = useDispatch()
    const {courseData} = useSelector(state=>state.course)
-
-
 
     const getCourseById = async () => {
       try {
@@ -88,16 +84,18 @@ const editCourseHandler = async () => {
     );
 
     const updatedCourse = result.data.course;
+    const currentCourseData = courseData || []; // Ensure courseData is an array
+
     if (updatedCourse.isPublished) {
-      const updatedCourses = courseData.map(c =>
+      const updatedCourses = currentCourseData.map(c =>
         c._id === courseId ? updatedCourse : c
       );
-      if (!courseData.some(c => c._id === courseId)) {
+      if (!currentCourseData.some(c => c._id === courseId)) {
         updatedCourses.push(updatedCourse);
       }
       dispatch(setCreatorCourseData(updatedCourses));
     } else {
-      const filteredCourses = courseData.filter(c => c._id !== courseId);
+      const filteredCourses = currentCourseData.filter(c => c._id !== courseId);
       dispatch(setCreatorCourseData(filteredCourses));
     }
 
@@ -117,7 +115,8 @@ const editCourseHandler = async () => {
     try {
       const result = await axios.delete(serverUrl + `/api/course/removecourse/${courseId}` , {withCredentials:true})
       toast.success("Course Deleted")
-       const filteredCourses = courseData.filter(c => c._id !== courseId);
+       const currentCourseData = courseData || [];
+       const filteredCourses = currentCourseData.filter(c => c._id !== courseId);
       dispatch(setCreatorCourseData(filteredCourses));
       console.log(result)
       navigate("/courses")
@@ -151,7 +150,7 @@ const editCourseHandler = async () => {
           {!isPublished? <button className="bg-green-100 text-green-600 px-4 py-2 rounded-md border-1" onClick={()=>setIsPublished(prev=>!prev)}>Click to Publish</button>
           :<button className="bg-red-100 text-red-600 px-4 py-2 rounded-md border-1" onClick={()=>setIsPublished(prev=>!prev)}>Click to UnPublish</button>
           }
-          <button className="bg-red-600 text-white px-4 py-2 rounded-md" disabled={loading} onClick={removeCourse}>{loading?<ClipLoader size={30} color='white'/> :"Remove Course"}</button>
+          <button className="bg-red-600 text-white px-4 py-2 rounded-md" disabled={loading} onClick={removeCourse}>{"Remove Course"}</button>
         </div>
 
         <form className="space-y-6" onSubmit={(e)=>e.preventDefault()}>
