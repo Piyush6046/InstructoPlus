@@ -14,6 +14,7 @@ export const createCourse = async (req, res) => {
       title,
       creator: req.userId,
       category,
+      isPublished: true, // Set isPublished to true by default
     });
     return res.status(200).json({
       success: true,

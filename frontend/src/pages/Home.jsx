@@ -8,8 +8,12 @@ import Logos from "../components/Logos";
 
 import { useNavigate } from "react-router-dom";
 import ExploreCourses from "../components/ExploreCourses";
+import Cardspage from "../components/Cardspage";
+import getCouseData from "../customHooks/getPublishedCourse"; // Import the custom hook
+
 function Home() {
   const navigate = useNavigate();
+  getCouseData(); // Call the custom hook to fetch course data
 
   return (
     <div className="w-[100%] overflow-hidden">
@@ -54,6 +58,7 @@ function Home() {
       </div>
       <Logos />
       <ExploreCourses />
+      <Cardspage/>
     </div>
   );
 }

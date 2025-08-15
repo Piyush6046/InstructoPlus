@@ -16,6 +16,8 @@ import EditProfile from './pages/EditProfile.jsx'
 import EditCourse from './pages/Educator/EditCourse.jsx'
 import CreateCourse from './pages/Educator/CreateCourse.jsx'
 import getCreatorCourse from './customHooks/getCreatorCourse.js'
+import AllCourses from './pages/AllCourses.jsx'; // Import AllCourses component
+
 function App() {
   getCurrentUser();
   getCreatorCourse();
@@ -34,9 +36,9 @@ function App() {
         <Route path='/courses' element={userData?.user.role==="educator" ? <Courses/> : <Navigate to="/signup" />}/>
 
         <Route path='/editcourses/:courseId' element={userData?.user.role==="educator" ? <EditCourse/> : <Navigate to="/signup" />}/>
-        
-        <Route path='/createcourses' element={userData?.user.role=="educator" ? <CreateCourse/> : <Navigate to="/signup" />}/>
 
+        <Route path='/createcourses' element={userData?.user.role=="educator" ? <CreateCourse/> : <Navigate to="/signup" />}/>
+        <Route path="/allcourses" element={<AllCourses />} />
       </Routes>
       <ToastContainer />
     </>
