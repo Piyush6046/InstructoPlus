@@ -15,9 +15,10 @@ import ForgotPassword from "./pages/ForgotPassword.jsx"
 import EditProfile from './pages/EditProfile.jsx'
 import EditCourse from './pages/Educator/EditCourse.jsx'
 import CreateCourse from './pages/Educator/CreateCourse.jsx'
+import getCreatorCourse from './customHooks/getCreatorCourse.js'
 function App() {
   getCurrentUser();
-  getCurrentUser();
+  getCreatorCourse();
   const {userData}  = useSelector((state) => state.user);
   return (
     <>
@@ -31,7 +32,9 @@ function App() {
         <Route path="/editprofile" element={!userData ? <Navigate to="/signup" /> : <EditProfile />} />"
         <Route path='/dashboard' element={userData?.user.role==="educator" ? <Dashboard/> : <Navigate to="/signup" />}/>
         <Route path='/courses' element={userData?.user.role==="educator" ? <Courses/> : <Navigate to="/signup" />}/>
-        <Route path='/editcourses' element={userData?.user.role==="educator" ? <EditCourse/> : <Navigate to="/signup" />}/>
+
+        <Route path='/editcourses/:courseId' element={userData?.user.role==="educator" ? <EditCourse/> : <Navigate to="/signup" />}/>
+        
         <Route path='/createcourses' element={userData?.user.role=="educator" ? <CreateCourse/> : <Navigate to="/signup" />}/>
 
       </Routes>

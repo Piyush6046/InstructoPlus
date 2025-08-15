@@ -1,7 +1,7 @@
 import React, { use, useEffect } from 'react'
 import axios from 'axios'
 import { serverUrl } from '../App'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setCreatorCourseData } from '../redux/courseSlice'
 
 function getCreatorCourse() {
