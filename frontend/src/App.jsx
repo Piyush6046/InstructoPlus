@@ -17,6 +17,7 @@ import EditCourse from './pages/Educator/EditCourse.jsx'
 import CreateCourse from './pages/Educator/CreateCourse.jsx'
 function App() {
   getCurrentUser();
+  getCurrentUser();
   const {userData}  = useSelector((state) => state.user);
   return (
     <>
@@ -31,7 +32,7 @@ function App() {
         <Route path='/dashboard' element={userData?.user.role==="educator" ? <Dashboard/> : <Navigate to="/signup" />}/>
         <Route path='/courses' element={userData?.user.role==="educator" ? <Courses/> : <Navigate to="/signup" />}/>
         <Route path='/editcourses' element={userData?.user.role==="educator" ? <EditCourse/> : <Navigate to="/signup" />}/>
-        <Route path='/createcourse' element={userData?.user.role==="educator" ? <CreateCourse/> : <Navigate to="/signup" />}/>
+        <Route path='/createcourses' element={userData?.user.role=="educator" ? <CreateCourse/> : <Navigate to="/signup" />}/>
 
       </Routes>
       <ToastContainer />

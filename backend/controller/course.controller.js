@@ -1,33 +1,31 @@
-import Course from "../model/course.Model"
+import Course from "../model/course.Model.js"
 
 export const createCourse = async (req, res) => {
   try {
-    const{tittle,category}=req.body
-    if(!tittle || !category){
+    const { title, category } = req.body;
+    if (!title || !category) {
       return res.status(400).json({
-        success:false,
-        message:"All fields are required"
-      })
+        success: false,
+        message: "Title and category are required",
+      });
     }
     const course = await Course.create({
-      tittle,
-      description,
+      title,
       creator: req.userId,
-      category
-    })
+      category,
+    });
     return res.status(200).json({
-      success:true,
-      course
-    })
+      success: true,
+      course,
+    });
   } catch (error) {
     return res.status(500).json({
-      success:false,
-      message:"error while creating course",
-      error
-    })
+      success: false,
+      message: "error while creating course",
+      error,
+    });
   }
-
-}
+};
 
 export const getPublishedCourses = async (req, res) => {
   try {
@@ -162,5 +160,3 @@ export const removeCourse=async(req,res)=>{
     })
   }
 }
-
-
