@@ -1,46 +1,62 @@
 import React from "react";
 import { FaStar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { AnimationContext } from "../App";
+import { useContext } from "react";
+
 const CourseCard = ({ thumbnail, title, category, price, id, reviews }) => {
   const navigate = useNavigate();
+  const { fadeUpItem } = useContext(AnimationContext);
+
   const calculateAverageRating = (reviews) => {
     if (!reviews || reviews.length === 0) return 0;
-
     const total = reviews.reduce((sum, review) => sum + review.rating, 0);
-    return (total / reviews.length).toFixed(1); // rounded to 1 decimal
+    return (total / reviews.length).toFixed(1);
   };
 
-  // Usage:
   const avgRating = calculateAverageRating(reviews);
-  console.log("Average Rating:", avgRating);
+
   return (
-    <div
-      className="max-w-sm w-full bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-300"
+    <motion.div
+      variants={fadeUpItem}
+      whileHover={{
+        y: -10,
+        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+      }}
+      className="bg-white rounded-xl overflow-hidden shadow-md cursor-pointer h-full"
       onClick={() => navigate(`/viewcourse/${id}`)}
     >
-      {/* Thumbnail */}
-      <img src={thumbnail} alt={title} className="w-full h-48 object-cover" />
+      <div className="relative overflow-hidden">
+        <img
+          src={thumbnail}
+          alt={title}
+          className="w-full h-48 object-cover transition-transform duration-500 hover:scale-110"
+        />
+        <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-4">
+          <h3 className="text-xl font-semibold text-white mb-2 line-clamp-2">
+            {title}
+          </h3>
+        </div>
+      </div>
 
-      {/* Content */}
-      <div className="p-5 space-y-2">
-        {/* Title */}
-        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-
-        {/* Category */}
-        <span className="px-2 py-0.5 bg-gray-100 rounded-full text-gray-700 capitalize">
+      <div className="p-6">
+        <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-4">
           {category}
         </span>
 
-        {/* Meta info */}
-        <div className="flex justify-between text-sm text-gray-600 mt-3 px-[10px]">
-          <span className="font-semibold text-gray-800">₹{price}</span>
+        <div className="flex justify-between items-center">
+          <span className="text-lg font-bold text-gray-900">₹{price}</span>
 
-          <span className="flex items-center gap-1 ">
-            <FaStar className="text-yellow-500" /> {avgRating}
-          </span>
+          <div className="flex items-center">
+            <FaStar className="text-yellow-400 mr-1" />
+            <span className="text-gray-700 font-medium">
+              {avgRating || "New"}
+            </span>
+          </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

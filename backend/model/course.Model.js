@@ -56,4 +56,6 @@ const courseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+
+
 export default mongoose.model("Course", courseSchema);

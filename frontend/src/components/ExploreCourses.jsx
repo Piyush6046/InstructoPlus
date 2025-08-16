@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { SiViaplay } from "react-icons/si";
 import { TbDeviceDesktopAnalytics } from "react-icons/tb";
 import { LiaUikit } from "react-icons/lia";
@@ -9,75 +9,129 @@ import { SiGoogledataproc } from "react-icons/si";
 import { BsClipboardDataFill } from "react-icons/bs";
 import { SiOpenaigym } from "react-icons/si";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { AnimationContext } from "../App";
+
+const categories = [
+  {
+    icon: <TbDeviceDesktopAnalytics className="w-12 h-12 text-indigo-600" />,
+    name: "Web Development",
+    bgColor: "bg-indigo-50",
+  },
+  {
+    icon: <LiaUikit className="w-12 h-12 text-pink-600" />,
+    name: "UI/UX Design",
+    bgColor: "bg-pink-50",
+  },
+  {
+    icon: <MdAppShortcut className="w-12 h-12 text-green-600" />,
+    name: "App Development",
+    bgColor: "bg-green-50",
+  },
+  {
+    icon: <FaHackerrank className="w-12 h-12 text-red-600" />,
+    name: "Ethical Hacking",
+    bgColor: "bg-red-50",
+  },
+  {
+    icon: <TbBrandOpenai className="w-12 h-12 text-blue-600" />,
+    name: "AI/ML",
+    bgColor: "bg-blue-50",
+  },
+  {
+    icon: <SiGoogledataproc className="w-12 h-12 text-purple-600" />,
+    name: "Data Science",
+    bgColor: "bg-purple-50",
+  },
+  {
+    icon: <BsClipboardDataFill className="w-12 h-12 text-yellow-600" />,
+    name: "Data Analytics",
+    bgColor: "bg-yellow-50",
+  },
+  {
+    icon: <SiOpenaigym className="w-12 h-12 text-teal-600" />,
+    name: "AI Tools",
+    bgColor: "bg-teal-50",
+  },
+];
+
 function ExploreCourses() {
   const navigate = useNavigate();
+  const { staggerChildren, fadeUpItem } = useContext(AnimationContext);
+
   return (
-    <div className="w-[100vw] min-h-[50vh] lg:h-[50vh] flex flex-col lg:flex-row items-center justify-center gap-4 px-[30px]">
-      <div className="w-[100%] lg:w-[350px] lg:h-[100%] h-[400px]  flex flex-col items-start justify-center gap-1 md:px-[40px]  px-[20px]">
-        <span className="text-[35px] font-semibold">Explore</span>
-        <span className="text-[35px] font-semibold">Our Courses</span>
-        <p className="text-[17px]">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem vel iure
-          explicabo laboriosam accusantium expedita laudantium facere magnam.
-        </p>
-        <button
-          className="px-[20px] py-[10px] border-2 bg-[black] border-white text-white rounded-[10px] text-[18px] font-light flex gap-2 mt-[40px]"
-          onClick={() => navigate("/allcourses")}
-        >
-          Explore Courses <SiViaplay className="w-[30px] h-[30px] fill-white" />
-        </button>
+    <section className="py-16 bg-gradient-to-b from-gray-50 to-indigo-50 relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute -top-20 -right-20 w-64 h-64 bg-indigo-100 rounded-full blur-3xl opacity-50"></div>
+      <div className="absolute bottom-10 left-10 w-40 h-40 bg-pink-100 rounded-full blur-3xl opacity-50"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="lg:flex justify-between items-center">
+          <div className="lg:w-1/3 mb-12 lg:mb-0">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-3xl font-bold text-gray-900 mb-4"
+            >
+              Explore Our Courses
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-lg text-gray-600 mb-6"
+            >
+              Discover a world of knowledge with our expertly crafted courses
+              designed to help you achieve your learning goals and advance your career.
+            </motion.p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/allcourses")}
+              className="flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors duration-300 shadow-lg"
+            >
+              Explore Courses
+              <SiViaplay className="ml-2 w-5 h-5" />
+            </motion.button>
+          </div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerChildren}
+            className="lg:w-2/3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+          >
+            {categories.map((category, index) => (
+              <motion.div
+                key={index}
+                variants={fadeUpItem}
+                whileHover={{
+                  y: -10,
+                  scale: 1.05,
+                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)"
+                }}
+                className={`${category.bgColor} p-4 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 hover:shadow-lg`}
+              >
+                <motion.div
+                  className="mb-3"
+                  whileHover={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {category.icon}
+                </motion.div>
+                <span className="text-sm font-medium text-gray-700 text-center">
+                  {category.name}
+                </span>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
       </div>
-      <div className="w-[720px] max-w-[90%] lg:h-[300px] md:min-h-[300px] flex items-center justify-center lg:gap-[60px] gap-[50px] flex-wrap mb-[50px] lg:mb-[0px]">
-        <div className="w-[100px] h-[130px] font-light text-[13px] flex flex-col gap-3 text-center ">
-          <div className="w-[100px] h-[90px] bg-[#fbd9fb] rounded-lg flex items-center justify-center ">
-            <TbDeviceDesktopAnalytics className="w-[60px] h-[60px] text-[#6d6c6c]" />
-          </div>
-          Web Devlopment
-        </div>
-        <div className="w-[100px] h-[130px] font-light text-[13px] flex flex-col gap-3 text-center ">
-          <div className="w-[100px] h-[90px] bg-[#d9fbe0] rounded-lg flex items-center justify-center ">
-            <LiaUikit className="w-[60px] h-[60px] text-[#6d6c6c]" />
-          </div>
-          UI UX Designing
-        </div>
-        <div className="w-[100px] h-[130px] font-light text-[13px] flex flex-col gap-3 text-center">
-          <div className="w-[100px] h-[90px] bg-[#fcb9c8] rounded-lg flex items-center justify-center ">
-            <MdAppShortcut className="w-[50px] h-[50px] text-[#6d6c6c]" />
-          </div>
-          App Devlopment
-        </div>
-        <div className="w-[100px] h-[130px] font-light text-[13px] flex flex-col gap-3 text-center">
-          <div className="w-[100px] h-[90px] bg-[#fbd9fb] rounded-lg flex items-center justify-center ">
-            <FaHackerrank className="w-[55px] h-[55px] text-[#6d6c6c]" />
-          </div>
-          Ethical Hacking
-        </div>
-        <div className="w-[100px] h-[130px] font-light text-[13px] flex flex-col gap-3 text-center">
-          <div className="w-[100px] h-[90px] bg-[#d9fbe0] rounded-lg flex items-center justify-center ">
-            <TbBrandOpenai className="w-[55px] h-[55px] text-[#6d6c6c]" />
-          </div>
-          AI/ML
-        </div>
-        <div className="w-[100px] h-[130px] font-light text-[13px] flex flex-col gap-3 text-center">
-          <div className="w-[100px] h-[90px] bg-[#fcb9c8] rounded-lg flex items-center justify-center ">
-            <SiGoogledataproc className="w-[45px] h-[45px] text-[#6d6c6c]" />
-          </div>
-          Data Science
-        </div>
-        <div className="w-[100px] h-[130px] font-light text-[13px] flex flex-col gap-3 text-center ">
-          <div className="w-[100px] h-[90px] bg-[#fbd9fb] rounded-lg flex items-center justify-center ">
-            <BsClipboardDataFill className="w-[50px] h-[50px] text-[#6d6c6c]" />
-          </div>
-          Data Analytics
-        </div>
-        <div className="w-[100px] h-[130px] font-light text-[13px] flex flex-col gap-3 text-center">
-          <div className="w-[100px] h-[90px] bg-[#d9fbe0] rounded-lg flex items-center justify-center ">
-            <SiOpenaigym className="w-[50px] h-[50px] text-[#6d6c6c]" />
-          </div>
-          AI Tools
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }
 
