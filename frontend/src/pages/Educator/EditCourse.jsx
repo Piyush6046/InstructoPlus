@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { ClipLoader } from "react-spinners";
 import { setCreatorCourseData } from "../../redux/courseSlice";
+import Nav from "../../components/Nav";
 function AddCourses() {
   const navigate = useNavigate();
   const { courseId } = useParams();
@@ -133,9 +134,11 @@ function AddCourses() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6 mt-10 bg-white rounded-lg shadow-md">
+    <> <Nav className="sticky top-0 z-50 " />
+    <div className="max-w-5xl mx-auto p-6  bg-white rounded-lg shadow-md">
       {/* Top Bar */}
-      <div className="flex items-center justify-center gap-[20px] md:justify-between flex-col md:flex-row  mb-6 relative">
+
+      <div className="flex items-center justify-center gap-[20px] md:justify-between flex-col md:flex-row  mt-32  mb-6 relative">
         <FaArrowLeftLong
           className="top-[-20%] md:top-[20%] absolute left-[0] md:left-[2%] w-[22px] h-[22px] cursor-pointer"
           onClick={() => navigate("/courses")}
@@ -334,6 +337,7 @@ function AddCourses() {
         </form>
       </div>
     </div>
+    </>
   );
 }
 

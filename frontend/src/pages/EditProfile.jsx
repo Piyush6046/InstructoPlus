@@ -6,25 +6,41 @@ import { setUserData } from '../redux/userSlice'
 import { toast } from 'react-toastify'
 import { ClipLoader } from 'react-spinners'
 import { useNavigate } from 'react-router-dom'
-import { FaArrowLeftLong } from "react-icons/fa6";
+import { FaArrowLeft, FaCamera } from "react-icons/fa";
+import { motion } from 'framer-motion';
+import { AnimationContext } from '../App';
+import { useContext } from 'react';
+import Nav from '../components/Nav'
+
 function EditProfile() {
   const { userData } = useSelector((state) => state.user);
   const [name, setName] = useState(userData?.user.name || "");
   const [description, setDescription] = useState(userData?.user.description || "");
-  const [photoUrl, setPhotoUrl] = useState(userData?.user.photoUrl || "");
+  const [photoUrl, setPhotoUrl] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(userData?.user.photoUrl || "");
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const fileInputRef = React.useRef(null);
+  const { fadeIn } = useContext(AnimationContext);
 
-  const formData = new FormData();
-  formData.append("name", name);
-  formData.append("description", description);
-  if (photoUrl) {
-    formData.append("photoUrl", photoUrl);
-  }
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPhotoUrl(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
 
   const updateProfile = async () => {
     setLoading(true);
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    if (photoUrl) {
+      formData.append("photoUrl", photoUrl);
+    }
+
     try {
       const result = await axios.post(
         serverUrl + "/api/user/updateprofile",
@@ -32,99 +48,114 @@ function EditProfile() {
         { withCredentials: true }
       );
       dispatch(setUserData(result.data));
-      navigate("/");
+      navigate("/profile");
       setLoading(false);
-      toast.success("Profile Update Successfully");
+      toast.success("Profile Updated Successfully");
     } catch (error) {
-      console.log(error);
-      toast.error("error in updating profile");
+      toast.error("Error updating profile");
       setLoading(false);
     }
   }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-10">
-      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-xl w-full relative">
-        <FaArrowLeftLong  className='absolute top-[5%] left-[5%] w-[22px] h-[22px] cursor-pointer' onClick={()=>navigate("/profile")}/>
+    <> <Nav />
+    <motion.div
+      className="min-h-screen flex items-center justify-center bg-gray-100 p-4"
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+    >
+
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
+        <button
+          className="absolute top-6 left-6 text-gray-500 hover:text-gray-700"
+          onClick={() => navigate("/profile")}
+        >
+          <FaArrowLeft size={20} />
+        </button>
+
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Edit Profile</h2>
 
-        <form  className="space-y-5" onSubmit={(e)=>e.preventDefault()}>
-          {/* Profile Photo */}
-
-           <div className="flex flex-col items-center text-center">
-          {userData.user.photoUrl ? <img
-            src={userData?.user.photoUrl}
-            alt=""
-            className="w-24 h-24 rounded-full object-cover border-4 border-[black]"
-          /> : <div className='w-24 h-24 rounded-full text-white flex items-center justify-center text-[30px] border-2 bg-black  border-white cursor-pointer'>
-         {userData?.user.name.slice(0,1).toUpperCase()}
-          </div>}
-          </div>
-          <div>
-            <label className="text-sm font-medium text-gray-700">Select Avatar</label>
+        <div className="flex flex-col items-center mb-6">
+          <div className="relative">
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="Profile"
+                className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-4xl font-bold border-4 border-white shadow-lg">
+                {userData?.user.name.charAt(0)}
+              </div>
+            )}
+            <button
+              className="absolute bottom-2 right-2 bg-indigo-600 text-white p-2 rounded-full shadow-md hover:bg-indigo-700 transition"
+              onClick={() => fileInputRef.current.click()}
+            >
+              <FaCamera size={16} />
+            </button>
             <input
               type="file"
-              name="photoUrl"
-              accept='image/*'
-              placeholder="Photo URL"
-              className="w-full px-4 py-2 border rounded-md text-sm "
-              onChange={(e)=>setPhotoUrl(e.target.files[0])}
+              ref={fileInputRef}
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
             />
           </div>
+        </div>
 
-          {/* Name */}
+        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
           <div>
-            <label className="text-sm font-medium text-gray-700">Full Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
             <input
               type="text"
-              name="name"
-
-              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[black] placeholder:text-black"
-              placeholder={userData.user.name}
-              onChange={(e)=>setName(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="Enter your full name"
               value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
 
-          {/* Email (read-only) */}
           <div>
-            <label className="text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
               type="email"
               readOnly
-              className="w-full mt-1 px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-600 placeholder:text-black"
-              placeholder={userData.user.email}
+              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-600"
+              value={userData?.user.email}
             />
           </div>
 
-          {/* Description */}
           <div>
-            <label className="text-sm font-medium text-gray-700">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
             <textarea
-              name="description"
-
-              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-[black]"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               rows={3}
               placeholder="Tell us about yourself"
-              onChange={(e)=>setDescription(e.target.value)}
               value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
+
           <button
-            className="w-full bg-[black] active:bg-[#454545] text-white py-2 rounded-md font-medium transition cursor-pointer" disabled={loading} onClick={()=>navigate("/forgotpassword")}
+            className="w-full bg-indigo-100 text-indigo-700 py-3 rounded-xl font-medium hover:bg-indigo-200 transition"
+            onClick={() => navigate("/forgotpassword")}
           >
             Reset Password
           </button>
 
-          {/* Save Button */}
           <button
-            type="submit"
-            className="w-full bg-[black] active:bg-[#454545] text-white py-2 rounded-md font-medium transition cursor-pointer" disabled={loading} onClick={updateProfile}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition shadow-md"
+            disabled={loading}
+            onClick={updateProfile}
           >
-            {loading ? <ClipLoader size={30} color='white'/> : "Save Changes"}
+            {loading ? <ClipLoader size={20} color='white' /> : "Save Changes"}
           </button>
         </form>
       </div>
-    </div>
+    </motion.div>
+    </>
   )
 }
 

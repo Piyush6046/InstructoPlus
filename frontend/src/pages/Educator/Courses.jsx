@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { setCreatorCourseData } from "../../redux/courseSlice";
 import img1 from "../../assets/empty.jpg";
 import { FaArrowLeftLong } from "react-icons/fa6";
+import Nav from "../../components/Nav";
 function Courses() {
   let navigate = useNavigate();
   let dispatch = useDispatch();
@@ -34,7 +35,7 @@ function Courses() {
     getCreatorData();
   }, []);
 
-  return (
+  return (<><Nav/>
     <div className="flex min-h-screen bg-gray-100">
       <div className="w-[100%] min-h-screen p-4 sm:p-6   bg-gray-100">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3 ">
@@ -171,6 +172,7 @@ function Courses() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

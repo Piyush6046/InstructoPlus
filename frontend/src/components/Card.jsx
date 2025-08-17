@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { AnimationContext } from "../App";
 import { useContext } from "react";
 
-const CourseCard = ({ thumbnail, title, category, price, id, reviews }) => {
+const CourseCard = ({ thumbnail, title, category, price, id, reviews, level }) => {
   const navigate = useNavigate();
   const { fadeUpItem } = useContext(AnimationContext);
 
@@ -16,43 +16,49 @@ const CourseCard = ({ thumbnail, title, category, price, id, reviews }) => {
   };
 
   const avgRating = calculateAverageRating(reviews);
+  const difficultyColors = {
+    Beginner: "bg-green-100 text-green-800",
+    Intermediate: "bg-yellow-100 text-yellow-800",
+    Advanced: "bg-red-100 text-red-800"
+  };
 
   return (
     <motion.div
       variants={fadeUpItem}
       whileHover={{
         y: -10,
-        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)"
       }}
-      className="bg-white rounded-xl overflow-hidden shadow-md cursor-pointer h-full"
+      className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer h-full"
       onClick={() => navigate(`/viewcourse/${id}`)}
     >
-      <div className="relative overflow-hidden">
+      <div className="relative">
         <img
           src={thumbnail}
           alt={title}
-          className="w-full h-48 object-cover transition-transform duration-500 hover:scale-110"
+          className="w-full h-48 object-cover"
         />
-        <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-4">
-          <h3 className="text-xl font-semibold text-white mb-2 line-clamp-2">
-            {title}
-          </h3>
-        </div>
+        {level && (
+          <span className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium ${difficultyColors[level]}`}>
+            {level}
+          </span>
+        )}
       </div>
 
-      <div className="p-6">
-        <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-4">
-          {category}
-        </span>
+      <div className="p-5">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 h-14">{title}</h3>
+          <span className="text-lg font-bold text-indigo-700">₹{price}</span>
+        </div>
 
         <div className="flex justify-between items-center">
-          <span className="text-lg font-bold text-gray-900">₹{price}</span>
+          <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs capitalize">
+            {category}
+          </span>
 
-          <div className="flex items-center">
-            <FaStar className="text-yellow-400 mr-1" />
-            <span className="text-gray-700 font-medium">
-              {avgRating || "New"}
-            </span>
+          <div className="flex items-center gap-1">
+            <FaStar className="text-yellow-400" />
+            <span className="text-sm font-medium">{avgRating || "New"}</span>
           </div>
         </div>
       </div>

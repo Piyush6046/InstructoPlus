@@ -1,89 +1,222 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import { useSelector } from "react-redux";
-// import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import img from "../../assets/empty.jpg"; // fallback photo
+import { FaArrowLeft, FaChartLine, FaUsers, FaBook, FaMoneyBillWave } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeftLong } from "react-icons/fa6";
+import { motion } from 'framer-motion';
+import { AnimationContext } from '../../App.jsx';
+import { useContext } from 'react';
+import Nav from '../../components/Nav.jsx';
+
 function Dashboard() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { userData } = useSelector((state) => state.user);
-  // const { creatorCourseData } = useSelector((state) => state.course);
-  // update based on your store
+  const { creatorCourseData } = useSelector((state) => state.course);
+  const { fadeIn, slideIn } = useContext(AnimationContext);
 
-  // Sample data - Replace with real API/course data
-  // const courseProgressData = creatorCourseData?.map(course => ({
-  //   name: course.title.slice(0, 10) + "...",
-  //   lectures: course.lectures.length || 0
-  // })) || [];
+  const [stats, setStats] = useState({
+    totalEarnings: 0,
+    totalStudents: 0,
+    totalCourses: 0,
+    enrollmentRate: 0
+  });
 
-  // const enrollData = creatorCourseData?.map(course => ({
-  //   name: course.title.slice(0, 10) + "...",
-  //   enrolled: course.enrolledStudents?.length || 0
-  // })) || [];
+  const [recentCourses, setRecentCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // const totalEarnings = creatorCourseData?.reduce((sum, course) => {
-  //   const studentCount = course.enrolledStudents?.length || 0;
-  //   const courseRevenue = course.price ? course.price * studentCount : 0;
-  //   return sum + courseRevenue;
-  // }, 0) || 0;
+  useEffect(() => {
+    // Simulate data loading
+    setTimeout(() => {
+      const totalEarnings = creatorCourseData?.reduce((sum, course) => {
+        const studentCount = course.enrolledStudents?.length || 0;
+        const courseRevenue = course.price ? course.price * studentCount : 0;
+        return sum + courseRevenue;
+      }, 0) || 0;
+
+      const totalStudents = creatorCourseData?.reduce((sum, course) =>
+        sum + (course.enrolledStudents?.length || 0), 0) || 0;
+
+      const totalCourses = creatorCourseData?.length || 0;
+
+      setStats({
+        totalEarnings,
+        totalStudents,
+        totalCourses,
+        enrollmentRate: totalCourses > 0 ? Math.round((totalStudents / totalCourses) * 100) / 100 : 0
+      });
+
+      setRecentCourses(creatorCourseData?.slice(0, 3) || []);
+      setLoading(false);
+    }, 800);
+  }, [creatorCourseData]);
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <FaArrowLeftLong className=' w-[22px] absolute top-[10%]
-      left-[10%] h-[22px] cursor-pointer' onClick={() => navigate("/")} />
-      <div className="w-full px-6 py-10   bg-gray-50 space-y-10">
-        {/* Welcome Section */}
-        <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row items-center gap-6">
-          <img
-            src={userData?.user.photoUrl || img}
-            alt="Educator"
-            className="w-28 h-28 rounded-full object-cover border-4 border-black shadow-md"
+    <><Nav />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50 p-6">
+
+
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center gap-3 mb-8">
+          <FaArrowLeft
+            className="text-gray-600 cursor-pointer"
+            onClick={() => navigate("/")}
           />
-          <div className="text-center md:text-left space-y-1">
-            <h1 className="text-2xl font-bold text-gray-800">
-              Welcome, {userData?.user.name || "Educator"} 👋
-            </h1>
-            <h1 className='text-xl font-semibold text-gray-800'>Total Earning : <span className='font-light text-gray-900'>₹{/*totalEarnings.toLocaleString() ||*/ 0}</span>  </h1>
-            <p className="text-gray-600 text-sm">
-              {userData?.user.description || "Start creating amazing courses for your students!"}
-            </p>
-            <h1 className='px-[10px] text-center  py-[10px] border-2  bg-black border-black text-white  rounded-[10px] text-[15px] font-light flex items-center justify-center gap-2 cursor-pointer' onClick={() => navigate("/courses")}>Create Courses</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Educator Dashboard</h1>
+        </div>
+
+        {/* Stats Cards */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          variants={slideIn}
+          initial="hidden"
+          animate="visible"
+        >
+          <div className="bg-white rounded-xl shadow-md p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+              <FaMoneyBillWave size={20} />
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">Total Earnings</p>
+              <p className="text-2xl font-bold text-gray-800">₹{stats.totalEarnings.toLocaleString()}</p>
+            </div>
           </div>
-        </div>
 
-        {/* Graphs Section */}
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Course Progress Chart */}
-          {/* <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold mb-4">Course Progress (Lectures)</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={courseProgressData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="lectures" fill="black" radius={[5, 5, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div> */}
+          <div className="bg-white rounded-xl shadow-md p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+              <FaUsers size={20} />
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">Total Students</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.totalStudents}</p>
+            </div>
+          </div>
 
-          {/* Enrolled Students Chart */}
-          {/* <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold mb-4">Student Enrollment</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={enrollData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="enrolled" fill="black" radius={[5, 5, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div> */}
-        </div>
+          <div className="bg-white rounded-xl shadow-md p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+              <FaBook size={20} />
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">Published Courses</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.totalCourses}</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
+              <FaChartLine size={20} />
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">Avg. Enrollment</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.enrollmentRate}/course</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Welcome Card */}
+        <motion.div
+          className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-lg p-8 mb-8 text-white"
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+        >
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="bg-white bg-opacity-20 p-2 rounded-full">
+              <div className="w-24 h-24 rounded-full bg-white text-indigo-600 flex items-center justify-center text-3xl font-bold">
+                {userData?.user.name.charAt(0)}
+              </div>
+            </div>
+            <div className="text-center md:text-left">
+              <h1 className="text-2xl font-bold mb-2">
+                Welcome back, {userData?.user.name} 👋
+              </h1>
+              <p className="text-indigo-100 max-w-xl">
+                {userData?.user.description || "Start creating amazing courses for your students!"}
+              </p>
+              <button
+                className="mt-4 px-6 py-3 bg-white text-indigo-600 rounded-xl font-medium hover:bg-indigo-50 transition-all"
+                onClick={() => navigate("/createcourses")}
+              >
+                Create New Course
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Recent Courses */}
+        <motion.div
+          className="bg-white rounded-2xl shadow-md p-6"
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.2 }}
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-800">Your Recent Courses</h2>
+            <button
+              className="text-indigo-600 hover:text-indigo-800 font-medium"
+              onClick={() => navigate("/courses")}
+            >
+              View All
+            </button>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+            </div>
+          ) : recentCourses.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recentCourses.map((course, index) => (
+                <div
+                  key={index}
+                  className="border rounded-xl overflow-hidden hover:shadow-md transition-all cursor-pointer"
+                  onClick={() => navigate(`/editcourses/${course._id}`)}
+                >
+                  <div className="h-40 bg-gray-200 relative">
+                    {course.thumbnail ? (
+                      <img
+                        src={course.thumbnail}
+                        alt={course.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-indigo-100 flex items-center justify-center">
+                        <FaBook className="text-indigo-400 text-3xl" />
+                      </div>
+                    )}
+                    <div className="absolute top-3 right-3 px-2 py-1 bg-white rounded-full text-xs font-medium">
+                      {course.isPublished ? "Published" : "Draft"}
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-gray-800 truncate">{course.title}</h3>
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="text-indigo-600 font-semibold">₹{course.price}</span>
+                      <span className="text-sm text-gray-500">
+                        {course.enrolledStudents?.length || 0} students
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10">
+              <div className="text-5xl mb-4">📚</div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">No courses yet</h3>
+              <p className="text-gray-500 mb-4">Create your first course to get started</p>
+              <button
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+                onClick={() => navigate("/createcourses")}
+              >
+                Create Course
+              </button>
+            </div>
+          )}
+        </motion.div>
       </div>
     </div>
-  )
+    </>
+  );
 }
 
-export default Dashboard
+export default Dashboard;

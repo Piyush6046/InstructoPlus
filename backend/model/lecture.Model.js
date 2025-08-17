@@ -22,10 +22,6 @@ const lectureSchema = new mongoose.Schema(
       ref: "Course",
       required: true,
     },
-    creator: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
     documents: [
       {
         description: String,

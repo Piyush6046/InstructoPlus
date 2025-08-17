@@ -1,6 +1,7 @@
 import Course from "../model/course.Model.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
 import Lecture from "../model/lecture.Model.js";
+import User from "../model/user.Model.js";
 
 export const createCourse = async (req, res) => {
   try {
@@ -32,10 +33,9 @@ export const createCourse = async (req, res) => {
 
 export const getPublishedCourses = async (req, res) => {
   try {
-    const courses = await Course.find({ isPublished: true }).populate(
-      "creator",
-      "name photoUrl"
-    );
+    const courses = await Course.find({ isPublished: true })
+      .populate("creator", "name photoUrl")
+      .populate("lectures");
     if (!courses) {
       return res.status(400).json({
         success: false,
@@ -58,10 +58,9 @@ export const getPublishedCourses = async (req, res) => {
 export const getCreatorCourses = async (req, res) => {
   try {
     const userId = req.userId;
-    const courses = await Course.find({ creator: userId }).populate(
-      "creator",
-      "name photoUrl"
-    );
+    const courses = await Course.find({ creator: userId })
+      .populate("creator", "name photoUrl")
+      .populate("lectures");
     if (!courses) {
       return res.status(400).json({
         success: false,
@@ -76,6 +75,54 @@ export const getCreatorCourses = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "error while getting creator courses",
+      error,
+    });
+  }
+};
+
+export const getCreator = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error while fetching creator",
+      error,
+    });
+  }
+}
+
+export const getCoursesByCreatorId = async (req, res) => {
+  try {
+    const { creatorId } = req.params;
+    const courses = await Course.find({ creator: creatorId, isPublished: true })
+      .populate("creator", "name photoUrl")
+      .populate("lectures");
+    if (!courses) {
+      return res.status(404).json({
+        success: false,
+        message: "Courses not found for this creator",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      courses,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error while fetching creator's courses",
       error,
     });
   }
@@ -245,39 +292,76 @@ export const getCourseLectures=async(req,res)=>{
   }
 }
 
-export const editLecuture=async(req,res)=>{
+export const editLecuture = async (req, res) => {
   try {
-    const {lectureId}=req.params
-    const {lectureTitle}=req.body
-    const {description,isPreviewFree}=req.body
-    const lecture=await Lecture.findById(lectureId);
-    if(!lecture){
-      return res.status(400).json({
-        success:false,
-        message:"Lecture not found"
-      })
+    const { lectureId } = req.params;
+    const { lectureTitle, description, isPreviewFree, removeVideo } = req.body;
+    let { documentInfos, removeDocuments } = req.body;
+
+    const lecture = await Lecture.findById(lectureId);
+    if (!lecture) {
+      return res.status(404).json({
+        success: false,
+        message: "Lecture not found",
+      });
     }
-    let videoUrl;
-    if(req.file){
-      videoUrl=await uploadOnCloudinary(req.file.path);
-      lecture.videoUrl=videoUrl
+
+    // Handle video update/removal
+    if (req.files && req.files.videoUrl && req.files.videoUrl[0]) {
+      const videoResult = await uploadOnCloudinary(req.files.videoUrl[0].path);
+      lecture.videoUrl = videoResult;
+    } else if (removeVideo === 'true') {
+      lecture.videoUrl = null;
     }
-    lecture.lectureTitle=lectureTitle
-    lecture.isPreviewFree=isPreviewFree
-    lecture.description=description
+
+    // Handle document removal
+    if (removeDocuments) {
+      removeDocuments = JSON.parse(removeDocuments);
+      if (Array.isArray(removeDocuments) && removeDocuments.length > 0) {
+        lecture.documents = lecture.documents.filter(
+          (doc) => !removeDocuments.includes(doc._id.toString())
+        );
+      }
+    }
+
+    // Handle new document uploads
+    if (documentInfos) {
+      documentInfos = JSON.parse(documentInfos);
+    }
+    if (req.files && req.files.documents && documentInfos) {
+      const uploadedDocuments = await Promise.all(
+        req.files.documents.map(async (file, index) => {
+          const docUrl = await uploadOnCloudinary(file.path);
+          const docInfo = documentInfos[index];
+          return {
+            title: docInfo.title,
+            description: docInfo.description,
+            url: docUrl,
+          };
+        })
+      );
+      lecture.documents.push(...uploadedDocuments);
+    }
+
+    // Update other fields
+    lecture.lectureTitle = lectureTitle;
+    lecture.isPreviewFree = isPreviewFree;
+    lecture.description = description;
+
     await lecture.save();
     return res.status(200).json({
-      success:true,
-      lecture
-    })
+      success: true,
+      lecture,
+    });
   } catch (error) {
+    console.error("Error editing lecture:", error);
     return res.status(500).json({
-      success:false,
-      message:"error while editing lecture",
-      error
-    })
+      success: false,
+      message: "Error while editing lecture",
+      error: error.message,
+    });
   }
-}
+};
 
 export const removeLecture=async(req,res)=>{
   try {
@@ -336,4 +420,3 @@ export const addDocuments=async(req,res)=>{
     })
   }
 }
-

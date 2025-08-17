@@ -4,203 +4,231 @@ import { useNavigate } from 'react-router-dom'
 import { ClipLoader } from 'react-spinners'
 import { serverUrl } from '../App'
 import { toast } from 'react-toastify'
+import { FaArrowLeft, FaLock } from "react-icons/fa";
+import { motion } from 'framer-motion';
+import { AnimationContext } from '../App';
+import { useContext } from 'react';
 
 function ForgotPassword() {
-    let navigate = useNavigate()
-    const [step,setStep] = useState(1)
-    const [email,setEmail] = useState("")
-    const [otp,setOtp] = useState("")
-    const [loading,setLoading]= useState(false)
-    const [newpassword,setNewPassword]= useState("")
-    const [conPassword,setConpassword]= useState("")
+  let navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [conPassword, setConpassword] = useState("");
+  const { fadeIn } = useContext(AnimationContext);
 
-   const handleStep1 = async () => {
-    setLoading(true)
+  const handleStep1 = async () => {
+    setLoading(true);
     try {
-      const result = await axios.post(`${serverUrl}/api/auth/sendotp` , {email} , {withCredentials:true})
-      console.log(result.data)
-      setStep(2)
-      toast.success(result.data.message)
-      setLoading(false)
+      const result = await axios.post(`${serverUrl}/api/auth/sendotp`, { email }, { withCredentials: true });
+      setStep(2);
+      toast.success(result.data.message);
+      setLoading(false);
     } catch (error) {
-      console.log(error)
-      toast.error(error.response.data.message)
-      setLoading(false)
+      toast.error(error.response?.data?.message || "Error sending OTP");
+      setLoading(false);
     }
-   }
-    const handleStep2 = async () => {
-    setLoading(true)
-    try {
-      const result = await axios.post(`${serverUrl}/api/auth/verifyotp` , {email,otp} , {withCredentials:true})
-      console.log(result)
-      toast.success(result.data.message)
-      setLoading(false)
-      setStep(3)
-    } catch (error) {
-      console.log(error)
-      toast.error(error.response.data.message)
-      setLoading(false)
-    }
+  };
 
-   }
-    const handleStep3 = async () => {
-    setLoading(true)
+  const handleStep2 = async () => {
+    setLoading(true);
     try {
-      if(newpassword !== conPassword){
-        return toast.error("password does not match")
+      const result = await axios.post(`${serverUrl}/api/auth/verifyotp`, { email, otp }, { withCredentials: true });
+      toast.success(result.data.message);
+      setLoading(false);
+      setStep(3);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Invalid OTP");
+      setLoading(false);
+    }
+  };
+
+  const handleStep3 = async () => {
+    setLoading(true);
+    try {
+      if (newPassword !== conPassword) {
+        return toast.error("Passwords do not match");
       }
-      const result = await axios.post(`${serverUrl}/api/auth/resetpassword` , {email,password:newpassword} , {withCredentials:true})
-      console.log(result)
-      toast.success(result.data.message)
-      setLoading(false)
-      navigate("/login")
+      const result = await axios.post(`${serverUrl}/api/auth/resetpassword`, { email, password: newPassword }, { withCredentials: true });
+      toast.success(result.data.message);
+      setLoading(false);
+      navigate("/login");
     } catch (error) {
-      console.log(error)
-      toast.error(error.response.data.message)
-      setLoading(false)
+      toast.error(error.response?.data?.message || "Error resetting password");
+      setLoading(false);
     }
+  };
 
-   }
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <motion.div
+            className="space-y-6"
+            variants={fadeIn}
+            initial="hidden"
+            animate="visible"
+          >
+            <div className="flex justify-center">
+              <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                <FaLock size={24} />
+              </div>
+            </div>
 
+            <h2 className="text-2xl font-bold text-center text-gray-800">
+              Forgot Your Password?
+            </h2>
 
-  return (
-     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-     { step==1 && <div className="bg-white shadow-md rounded-xl p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-          Forgot Your Password?
-        </h2>
+            <p className="text-gray-600 text-center">
+              Enter your email address to reset your password
+            </p>
 
-          <form  className="space-y-4" onSubmit={(e)=>e.preventDefault()}>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Enter your email address
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address
               </label>
               <input
                 type="email"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[black]"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="you@example.com"
-                onChange={(e)=>setEmail(e.target.value)}
-
                 value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
 
             <button
-              type="submit"
-              className="w-full bg-[black] hover:bg-[#4b4b4b] text-white py-2 px-4 rounded-md font-medium cursor-pointer" disabled={loading} onClick={handleStep1}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition shadow-md"
+              disabled={loading}
+              onClick={handleStep1}
             >
-              {loading?<ClipLoader size={30} color='white'/>:"Send OTP"}
+              {loading ? <ClipLoader size={20} color="white" /> : "Send OTP"}
             </button>
-          </form>
 
+            <button
+              className="w-full flex items-center justify-center gap-2 text-gray-600 hover:text-gray-800 mt-4"
+              onClick={() => navigate("/login")}
+            >
+              <FaArrowLeft size={14} /> Back to Login
+            </button>
+          </motion.div>
+        );
 
-        <div className=" cursor-pointer text-sm text-center mt-4" onClick={()=>navigate("/login")} >
+      case 2:
+        return (
+          <motion.div
+            className="space-y-6"
+            variants={fadeIn}
+            initial="hidden"
+            animate="visible"
+          >
+            <div className="flex justify-center">
+              <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                <div className="text-xl font-bold">OTP</div>
+              </div>
+            </div>
 
-            Back to Login
+            <h2 className="text-2xl font-bold text-center text-gray-800">
+              Enter OTP
+            </h2>
 
-        </div>
-      </div>}
+            <p className="text-gray-600 text-center">
+              We sent a 4-digit code to your email. Please enter it below.
+            </p>
 
-
-      {step==2 && <div className="bg-white shadow-lg rounded-xl p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">
-          Enter OTP
-        </h2>
-
-
-        {/* OTP Inputs */}
-
-          <form  className="space-y-4" onSubmit={(e)=>e.preventDefault()}>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Please enter the 4-digit code sent to your email.
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Verification Code
               </label>
               <input
                 type="text"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[black]"
-                placeholder="Enter Here"
-                onChange={(e)=>setOtp(e.target.value)}
-
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-xl tracking-widest"
+                placeholder="1234"
                 value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
                 required
               />
             </div>
 
             <button
-              type="submit"
-              className="w-full bg-[black] hover:bg-[#4b4b4b] text-white py-2 px-4 rounded-md font-medium cursor-pointer" disabled={loading} onClick={handleStep2}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition shadow-md"
+              disabled={loading}
+              onClick={handleStep2}
             >
-              {loading?<ClipLoader size={30} color='white'/>:"Verify OTP"}
+              {loading ? <ClipLoader size={20} color="white" /> : "Verify OTP"}
             </button>
-          </form>
+          </motion.div>
+        );
 
-
-        <div className=" cursor-pointer text-sm text-center mt-4" onClick={()=>navigate("/login")} >
-
-            Back to Login
-
-        </div>
-
-
-
-
-      </div>}
-      {step==3 &&   <div className="bg-white shadow-lg rounded-xl p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">
-          Reset Your Password
-        </h2>
-        <p className="text-sm text-gray-500 text-center mb-6">
-          Enter a new password below to regain access to your account.
-        </p>
-
-        <form className="space-y-5" onSubmit={(e)=>e.preventDefault()}>
-          {/* New Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" >
-              New Password
-            </label>
-            <input
-              type="text"
-              placeholder="Enter new password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[black] focus:outline-none" onChange={(e)=>setNewPassword(e.target.value)}
-
-                value={newpassword}
-            />
-          </div>
-
-          {/* Confirm Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm Password
-            </label>
-            <input
-              type="text"
-              placeholder="Re-enter new password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[black] focus:outline-none" onChange={(e)=>setConpassword(e.target.value)}
-
-                value={conPassword}
-            />
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-[black] hover:bg-[#4b4b4b] text-white py-2 rounded-md font-medium" onClick={handleStep3}
+      case 3:
+        return (
+          <motion.div
+            className="space-y-6"
+            variants={fadeIn}
+            initial="hidden"
+            animate="visible"
           >
-            {loading?<ClipLoader size={30} color='white'/>:"Reset Password"}
-          </button>
-        </form>
+            <div className="flex justify-center">
+              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                <FaLock size={24} />
+              </div>
+            </div>
 
-        {/* Back to login */}
-        <div  className="cursor-pointer text-center text-sm mt-8 " onClick={()=>navigate("/login")}>
+            <h2 className="text-2xl font-bold text-center text-gray-800">
+              Reset Your Password
+            </h2>
 
-            <span className='cursor-pointer'>Back to Login</span>
+            <p className="text-gray-600 text-center">
+              Enter a new password for your account
+            </p>
 
-        </div>
-      </div>}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                New Password
+              </label>
+              <input
+                type="password"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Re-enter new password"
+                value={conPassword}
+                onChange={(e) => setConpassword(e.target.value)}
+              />
+            </div>
+
+            <button
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition shadow-md"
+              onClick={handleStep3}
+              disabled={loading}
+            >
+              {loading ? <ClipLoader size={20} color="white" /> : "Reset Password"}
+            </button>
+          </motion.div>
+        );
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+        {renderStep()}
+      </div>
     </div>
-  )
+  );
 }
 
-export default ForgotPassword
+export default ForgotPassword;

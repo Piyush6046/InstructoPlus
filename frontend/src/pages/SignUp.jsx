@@ -1,118 +1,205 @@
 import React, { useState } from 'react'
 import logo from '../assets/logo.jpg'
-import google from '../assets/google.jpg'
+import googleIcon from '../assets/google.jpg'
 import axios from 'axios'
 import { serverUrl } from '../App'
-import { MdOutlineRemoveRedEye } from "react-icons/md";
+import { MdOutlineRemoveRedEye, MdRemoveRedEye } from "react-icons/md";
 import { signInWithPopup } from 'firebase/auth'
-import { MdRemoveRedEye } from "react-icons/md";
 import { useNavigate } from 'react-router-dom'
 import { auth, provider } from '../../utils/firebase.js'
-import { ClipLoader } from 'react-spinners'
 import { toast } from 'react-toastify'
+import { ClipLoader } from 'react-spinners'
 import { useDispatch } from 'react-redux'
 import { setUserData } from '../redux/userSlice'
+import { motion } from 'framer-motion';
+import { AnimationContext } from '../App';
+import { useContext } from 'react';
+
 function SignUp() {
-    const [name,setName]= useState("")
-    const [email,setEmail]= useState("")
-    const [password,setPassword]= useState("")
-    const [role,setRole]= useState("student")
-    const navigate = useNavigate()
-    let [show,setShow] = useState(false)
-    const [loading,setLoading]= useState(false)
-    let dispatch = useDispatch()
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [role, setRole] = useState("student")
+  const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const dispatch = useDispatch()
+  const { fadeIn } = useContext(AnimationContext);
 
-    const handleSignUp = async () => {
-        setLoading(true)
-        try {
-            const result = await axios.post(serverUrl + "/api/auth/signup" , {name , email , password , role} , {withCredentials:true} )
-            dispatch(setUserData(result.data))
-            navigate("/")
-            toast.success("SignUp Successfully")
-            setLoading(false)
-        }
-        catch (error) {
-            console.log(error)
-            setLoading(false)
-            toast.error(error.response.data.message)
-        }
-
+  const handleSignUp = async () => {
+    setLoading(true)
+    try {
+      const result = await axios.post(
+        serverUrl + "/api/auth/signup",
+        { name, email, password, role },
+        { withCredentials: true }
+      )
+      dispatch(setUserData(result.data))
+      navigate("/")
+      toast.success("Sign Up Successful")
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      toast.error(error.response?.data?.message || "Sign Up Failed")
     }
-    const googleSignUp = async () => {
-        try {
-            const response = await signInWithPopup(auth,provider)
-            console.log(response)
-            let user = response.user
-            let Gname = user.displayName;
-            let Gemail = user.email
-            let photourl= user.photoURL
-            console.log(Gname,Gemail,photourl);
+  }
 
-            if(!Gname || !Gemail){
-                toast.error("User validation failed: name and email are required.")
-                return
-            }
-
-            const result = await axios.post(serverUrl + "/api/auth/googleAuth" , {name: Gname, email: Gemail, role, photo: photourl}
-                , {withCredentials:true}
-            )
-            dispatch(setUserData(result.data))
-            navigate("/")
-            toast.success("SignUp Successfully")
-        } catch (error) {
-            console.log(error)
-            toast.error(error.response.data.message)
-        }
+  const googleSignUp = async () => {
+    try {
+      const response = await signInWithPopup(auth, provider)
+      const user = response.user;
+      const result = await axios.post(
+        serverUrl + "/api/auth/googleAuth",
+        {
+          name: user.displayName,
+          email: user.email,
+          photo: user.photoURL,
+          role
+        },
+        { withCredentials: true }
+      )
+      dispatch(setUserData(result.data))
+      navigate("/")
+      toast.success("Sign Up Successful")
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Google Sign Up Failed")
     }
+  }
+
   return (
-    <div className='bg-[#dddbdb] w-[100vw] h-[100vh] flex items-center justify-center flex-col gap-3'>
-        <form className='w-[90%] md:w-200 h-150 bg-[white] shadow-xl rounded-2xl flex' onSubmit={(e)=>e.preventDefault()}>
-            <div className='md:w-[50%] w-[100%] h-[100%] flex flex-col items-center justify-center gap-3 '>
-                <div><h1 className='font-semibold text-[black] text-2xl'>Let's get Started</h1>
-                <h2 className='text-[#999797] text-[18px]'>Create your account</h2>
-                </div>
-                <div className='flex flex-col gap-1 w-[80%] items-start justify-center px-3'>
-                    <label htmlFor="name" className='font-semibold'>
-                        Name
-                    </label>
-                    <input id='name' type="text" className='border-1 w-[100%] h-[35px] border-[#e7e6e6] text-[15px] px-[20px]'placeholder='Your name' onChange={(e)=>setName(e.target.value)} value={name} />
-                </div>
-                 <div className='flex flex-col gap-1 w-[80%] items-start justify-center px-3'>
-                    <label htmlFor="email" className='font-semibold'>
-                        Email
-                    </label>
-                    <input id='email' type="text" className='border-1 w-[100%] h-[35px] border-[#e7e6e6] text-[15px] px-[20px]'placeholder='Your email' onChange={(e)=>setEmail(e.target.value)} value={email} />
-                </div>
-                 <div className='flex flex-col gap-1 w-[80%] items-start justify-center px-3 relative'>
-                    <label htmlFor="password" className='font-semibold'>
-                        Password
-                    </label>
-                    <input id='password' type={show?"text":"password"} className='border-1 w-[100%] h-[35px] border-[#e7e6e6] text-[15px] px-[20px]' placeholder='***********' onChange={(e)=>setPassword(e.target.value)} value={password}/>
-                    {!show && <MdOutlineRemoveRedEye className='absolute w-[20px] h-[20px] cursor-pointer right-[5%] bottom-[10%]' onClick={()=>setShow(prev => !prev)}/>}
-              {show && <MdRemoveRedEye className='absolute w-[20px] h-[20px] cursor-pointer right-[5%] bottom-[10%]' onClick={()=>setShow(prev => !prev)} />}
-                </div>
-                 <div className='flex md:w-[50%] w-[70%] items-center justify-between'>
-                  <span className={`px-[10px] py-[5px] border-[1px] border-[#e7e6e6] rounded-2xl  cursor-pointer ${role === 'student' ? "border-black" : "border-[#646464]"}`} onClick={()=>setRole("student")}>Student</span>
-                  <span className={`px-[10px] py-[5px] border-[1px] border-[#e7e6e6] rounded-2xl  cursor-pointer ${role === 'educator' ? "border-black" : "border-[#646464]"}`}  onClick={()=>setRole("educator")}>Educator</span>
-                </div>
-                <button className='w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]' disabled={loading} onClick={handleSignUp}>{loading?<ClipLoader size={30} color='white' /> : "Sign Up"}</button>
+    <motion.div
+      className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4"
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+    >
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+        {/* Left Side - Form */}
+        <div className="w-full md:w-1/2 p-8 flex flex-col items-center justify-center">
+          <div className="w-full max-w-xs">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
+            <p className="text-gray-600 mb-8">Join us to start learning</p>
 
-                <div className='w-[80%] flex items-center gap-2'>
-                    <div className='w-[25%] h-[0.5px] bg-[#c4c4c4]'></div>
-                    <div className='w-[50%] text-[15px] text-[#6f6f6f] flex items-center justify-center '>Or continue with</div>
-                    <div className='w-[25%] h-[0.5px] bg-[#c4c4c4]'></div>
+            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent pr-10"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-10 text-gray-500"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <MdRemoveRedEye size={20} /> : <MdOutlineRemoveRedEye size={20} />}
+                </button>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    className={`flex-1 py-2 rounded-xl border ${
+                      role === 'student'
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                    onClick={() => setRole("student")}
+                  >
+                    Student
+                  </button>
+                  <button
+                    type="button"
+                    className={`flex-1 py-2 rounded-xl border ${
+                      role === 'educator'
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                    onClick={() => setRole("educator")}
+                  >
+                    Educator
+                  </button>
                 </div>
-                <div className='w-[80%] h-[40px] border-1 border-[black] rounded-[5px] flex items-center justify-center  ' onClick={googleSignUp} ><img src={google} alt="" className='w-[25px]' /><span className='text-[18px] text-gray-500'>oogle</span> </div>
-                 <div className='text-[#6f6f6f]'>Already have an account? <span className='underline underline-offset-1 text-[black]' onClick={()=>navigate("/login")}>Login</span></div>
+              </div>
 
-            </div>
-            <div className='w-[50%] h-[100%] rounded-r-2xl bg-[black] md:flex items-center justify-center flex-col hidden'><img src={logo} className='w-30 shadow-2xl' alt="" />
-            <span className='text-[white] text-2xl'>VIRTUAL COURSES</span>
-            </div>
+              <button
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition shadow-md"
+                onClick={handleSignUp}
+                disabled={loading}
+              >
+                {loading ? <ClipLoader size={20} color="white" /> : "Sign Up"}
+              </button>
 
-        </form>
+              <div className="relative flex items-center justify-center my-6">
+                <div className="absolute inset-0 border-t border-gray-300"></div>
+                <div className="relative bg-white px-4 text-sm text-gray-500">Or continue with</div>
+              </div>
 
-    </div>
+              <button
+                type="button"
+                className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-xl py-3 text-gray-700 hover:bg-gray-50 transition"
+                onClick={googleSignUp}
+              >
+                <img src={googleIcon} alt="Google" className="w-5 h-5" />
+                <span>Sign up with Google</span>
+              </button>
+
+              <div className="text-center text-gray-600">
+                Already have an account?{' '}
+                <button
+                  className="text-indigo-600 hover:text-indigo-800 font-medium"
+                  onClick={() => navigate("/login")}
+                >
+                  Login
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* Right Side - Image */}
+        <div className="hidden md:block w-1/2 bg-gradient-to-br from-indigo-700 to-purple-700 relative">
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-white">
+            <img
+              src={logo}
+              className="w-32 h-32 rounded-full border-4 border-white mb-6"
+              alt="LearnHub Logo"
+            />
+            <h2 className="text-3xl font-bold mb-2">LearnHub</h2>
+            <p className="text-center text-indigo-200 max-w-xs">
+              Start your learning journey with us today
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
   )
 }
 

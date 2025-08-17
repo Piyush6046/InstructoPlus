@@ -18,7 +18,10 @@ import CreateCourse from './pages/Educator/CreateCourse.jsx'
 import getCreatorCourse from './customHooks/getCreatorCourse.js'
 import AllCourses from './pages/AllCourses.jsx'
 import CreateLecture from './pages/Educator/CreateLecture.jsx'
-import { AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import ViewCourse from './pages/ViewCourse.jsx'
+import EditLecture from './pages/Educator/EditLecture.jsx'
+import Nav from './components/Nav.jsx'
 
 // Animation context
 export const AnimationContext = React.createContext({
@@ -74,6 +77,8 @@ function App() {
           <Route path='/createcourses' element={userData?.user.role=="educator" ? <CreateCourse/> : <Navigate to="/signup" />}/>
           <Route path="/allcourses" element={<AllCourses />} />
           <Route path='/createlecture/:courseId' element={userData?.user.role=="educator" ? <CreateLecture/> : <Navigate to="/signup" />}/>
+          <Route path='/viewcourse/:courseId' element={<ViewCourse />} />
+           <Route path='/editlecture/:courseId/:lectureId' element={<EditLecture />} />
         </Routes>
       </AnimatePresence>
       <ToastContainer position="top-center" autoClose={3000} />

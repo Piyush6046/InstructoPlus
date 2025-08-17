@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../../App";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
+import Nav from "../../components/Nav";
 
 const CreateCourse = () => {
   let navigate = useNavigate();
@@ -34,7 +35,8 @@ const CreateCourse = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-10">
+    <><Nav classname="sticky top-0 z-50 pb-10" />
+    <div className="min-h-screen flex items-center pt-32 justify-center bg-gray-100 px-4 py-10">
       <div className="max-w-xl w-[600px] mx-auto p-6 bg-white shadow-md rounded-md mt-10 relative">
         <FaArrowLeftLong
           className="top-[8%] absolute left-[5%] w-[22px] h-[22px] cursor-pointer"
@@ -93,6 +95,7 @@ const CreateCourse = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 
