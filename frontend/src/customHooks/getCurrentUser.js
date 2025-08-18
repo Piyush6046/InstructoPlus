@@ -6,21 +6,23 @@ import { setUserData } from '../redux/userSlice';
 
 const useGetCurrentUser = () => {
   const dispatch = useDispatch();
-  
+
+  const fetchUser = async () => {
+    try {
+      const res = await axios.get(serverUrl + "/api/user/getcurrentuser", { withCredentials: true });
+      dispatch(setUserData(res.data));
+      console.log("User data fetched:", res.data);
+    } catch (error) {
+      console.log("Error fetching user:", error);
+      dispatch(setUserData(null));
+    }
+  };
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get(serverUrl + "/api/user/getcurrentuser", { withCredentials: true });
-        dispatch(setUserData(res.data));
-        console.log("User data fetched:", res.data);
-      } catch (error) {
-        console.log("Error fetching user:", error);
-        dispatch(setUserData(null));
-      }
-    };
-    
     fetchUser();
   }, [dispatch]);
+
+  return fetchUser; // Return the fetchUser function
 };
 
 export default useGetCurrentUser;
