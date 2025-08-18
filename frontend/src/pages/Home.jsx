@@ -12,6 +12,8 @@ import getCouseData from "../customHooks/getPublishedCourse";
 import { motion } from "framer-motion";
 import { AnimationContext } from "../App";
 import { useContext } from "react";
+import About from "../components/About";
+import Footer from "../components/Footer";
 
 function Home() {
   const navigate = useNavigate();
@@ -177,6 +179,8 @@ function Home() {
       <Logos />
       <ExploreCourses />
       <Cardspage />
+      <About/>
+      <Footer/>
     </div>
   );
 }

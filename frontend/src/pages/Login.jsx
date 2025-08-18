@@ -153,9 +153,9 @@ function Login() {
             <img
               src={logo}
               className="w-32 h-32 rounded-full border-4 border-white mb-6"
-              alt="LearnHub Logo"
+              alt="InstructoPlus Logo"
             />
-            <h2 className="text-3xl font-bold mb-2">LearnHub</h2>
+            <h2 className="text-3xl font-bold mb-2">InstructoPlus</h2>
             <p className="text-center text-indigo-200 max-w-xs">
               Grow your skills with our expert-led courses
             </p>
