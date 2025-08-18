@@ -12,14 +12,14 @@ function getCreatorCourse() {
       const creatorCourses=async()=>{
         try {
           const res=await axios.get(serverUrl+"/api/course/getcreator",{withCredentials:true});
-          dispatch(setCreatorCourseData(res.data));
+          dispatch(setCreatorCourseData(res.data.courses));
           console.log(res.data);
         } catch (error) {
           console.log(error);
         }
       }
       creatorCourses();
-    },[userData])
+    },[])
   )
 }
 

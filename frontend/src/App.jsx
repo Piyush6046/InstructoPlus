@@ -34,8 +34,8 @@ export const AnimationContext = React.createContext({
 
 function App() {
   getCurrentUser();
-  getCreatorCourse();
   const {userData} = useSelector((state) => state.user);
+  getCreatorCourse(); // Call the hook inside the functional component
 
   // Animation variants
   const animationVariants = {

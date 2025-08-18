@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 import { FaArrowLeft, FaChartLine, FaUsers, FaBook, FaMoneyBillWave } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AnimationContext } from '../../App.jsx';
 import { useContext } from 'react';
 import Nav from '../../components/Nav.jsx';
+import { serverUrl } from '../../App.jsx';
 
 function Dashboard() {
   const navigate = useNavigate();
   const { userData } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const { creatorCourseData } = useSelector((state) => state.course);
   const { fadeIn, slideIn } = useContext(AnimationContext);
 
@@ -17,36 +20,56 @@ function Dashboard() {
     totalEarnings: 0,
     totalStudents: 0,
     totalCourses: 0,
-    enrollmentRate: 0
+    enrollmentRate: 0,
+    lecturesUploaded: 0,
+    lecturesInDraft: 0,
   });
 
   const [recentCourses, setRecentCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate data loading
-    setTimeout(() => {
-      const totalEarnings = creatorCourseData?.reduce((sum, course) => {
+    if (creatorCourseData) {
+      const courses = creatorCourseData;
+
+      const totalEarnings = courses.reduce((sum, course) => {
         const studentCount = course.enrolledStudents?.length || 0;
         const courseRevenue = course.price ? course.price * studentCount : 0;
         return sum + courseRevenue;
-      }, 0) || 0;
+      }, 0);
 
-      const totalStudents = creatorCourseData?.reduce((sum, course) =>
-        sum + (course.enrolledStudents?.length || 0), 0) || 0;
+      const totalStudents = courses.reduce((sum, course) =>
+        sum + (course.enrolledStudents?.length || 0), 0);
 
-      const totalCourses = creatorCourseData?.length || 0;
+      const totalCourses = courses.length;
+
+      let lecturesUploaded = 0;
+      let lecturesInDraft = 0;
+
+      courses.forEach(course => {
+        course.lectures.forEach(lecture => {
+          if (lecture.isPublished) {
+            lecturesUploaded++;
+          } else {
+            lecturesInDraft++;
+          }
+        });
+      });
 
       setStats({
         totalEarnings,
         totalStudents,
         totalCourses,
-        enrollmentRate: totalCourses > 0 ? Math.round((totalStudents / totalCourses) * 100) / 100 : 0
+        enrollmentRate: totalCourses > 0 ? Math.round((totalStudents / totalCourses) * 100) / 100 : 0,
+        lecturesUploaded,
+        lecturesInDraft,
       });
 
-      setRecentCourses(creatorCourseData?.slice(0, 3) || []);
+      setRecentCourses(courses.slice(0, 3));
       setLoading(false);
-    }, 800);
+    } else {
+      setLoading(true);
+    }
   }, [creatorCourseData]);
 
   return (
@@ -97,6 +120,26 @@ function Dashboard() {
             <div>
               <p className="text-gray-500 text-sm">Published Courses</p>
               <p className="text-2xl font-bold text-gray-800">{stats.totalCourses}</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+              <FaBook size={20} />
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">Lectures Uploaded</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.lecturesUploaded}</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+              <FaBook size={20} />
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">Lectures in Draft</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.lecturesInDraft}</p>
             </div>
           </div>
 
@@ -195,6 +238,15 @@ function Dashboard() {
                         {course.enrolledStudents?.length || 0} students
                       </span>
                     </div>
+                    <button
+                      className="mt-4 w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent navigating to editcourses
+                        navigate(`/educator/enrolledstudents/${course._id}`);
+                      }}
+                    >
+                      Check Students
+                    </button>
                   </div>
                 </div>
               ))}
