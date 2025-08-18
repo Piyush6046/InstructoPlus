@@ -3,7 +3,7 @@ import uploadOnCloudinary from "../config/cloudinary.js";
 
 export const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select("-password");
+    const user = await User.findById(req.userId).select("-password").populate("enrolledCourses");
     res.status(200).json({
       success: true,
       user,
@@ -55,3 +55,4 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
+

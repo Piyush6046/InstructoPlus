@@ -22,6 +22,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import ViewCourse from './pages/ViewCourse.jsx'
 import EditLecture from './pages/Educator/EditLecture.jsx'
 import Nav from './components/Nav.jsx'
+import ViewLecture from './pages/ViewLectures.jsx'
+import EnrolledCourse from './pages/EnrolledCourse.jsx'
 
 // Animation context
 export const AnimationContext = React.createContext({
@@ -77,8 +79,10 @@ function App() {
           <Route path='/createcourses' element={userData?.user.role=="educator" ? <CreateCourse/> : <Navigate to="/signup" />}/>
           <Route path="/allcourses" element={<AllCourses />} />
           <Route path='/createlecture/:courseId' element={userData?.user.role=="educator" ? <CreateLecture/> : <Navigate to="/signup" />}/>
-          <Route path='/viewcourse/:courseId' element={<ViewCourse />} />
-           <Route path='/editlecture/:courseId/:lectureId' element={<EditLecture />} />
+          <Route path='/viewcourse/:courseId'element={userData?.user.role==="educator" ? <ViewCourse/> : <Navigate to="/signup" />} />
+          <Route path='/editlecture/:courseId/:lectureId' element={userData?.user.role==="educator" ? <EditLecture/> : <Navigate to="/signup" />} />
+          <Route path='/viewlecture/:courseId' element={<ViewLecture />} />
+          <Route path='/enrolledcourses/' element={userData?<EnrolledCourse/> : <Navigate to="/login" />} />
         </Routes>
       </AnimatePresence>
       <ToastContainer position="top-center" autoClose={3000} />

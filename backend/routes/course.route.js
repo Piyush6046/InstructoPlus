@@ -23,4 +23,5 @@ courseRouter.delete("/removelecture/:lectureId",isAuth,removeLecture)
 courseRouter.post("/addDocuments/:lectureId",isAuth,upload.array("documents"),addDocuments)
 courseRouter.post("/getcreator",isAuth, getCreator)
 
+
 export default courseRouter;
