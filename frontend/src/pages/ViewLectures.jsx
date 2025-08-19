@@ -10,6 +10,8 @@ function ViewLecture() {
   const { courseData } = useSelector((state) => state.course);
   const { userData } = useSelector((state) => state.user);
   const selectedCourse = courseData?.find((course) => course._id === courseId);
+  console.log(selectedCourse);
+
 
   const [selectedLecture, setSelectedLecture] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -255,7 +257,7 @@ function ViewLecture() {
               <img
                 src={selectedCourse.creator?.photoUrl || "/default-avatar.png"}
                 alt="Instructor"
-                className="w-14 h-14 rounded-full object-cover border-2 border-white shadow"
+                className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"
               />
               <div>
                 <h4 className="font-medium text-gray-800">
@@ -263,6 +265,9 @@ function ViewLecture() {
                 </h4>
                 <p className="text-gray-600 text-sm mt-1">
                   {selectedCourse.creator?.description || "No bio available"}
+                </p>
+                <p className="text-gray-600 text-sm mt-1">
+                  {selectedCourse.creator?.email}
                 </p>
               </div>
             </div>

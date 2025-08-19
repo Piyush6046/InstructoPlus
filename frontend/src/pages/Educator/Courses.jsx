@@ -25,7 +25,6 @@ function Courses() {
         });
 
         await dispatch(setCreatorCourseData(result.data.courses));
-
         console.log(result.data);
       } catch (error) {
         console.log(error);
@@ -35,9 +34,10 @@ function Courses() {
     getCreatorData();
   }, []);
 
-  return (<><Nav/>
+  return (<>
+  <Nav/>
     <div className="flex min-h-screen bg-gray-100">
-      <div className="w-[100%] min-h-screen p-4 sm:p-6   bg-gray-100">
+      <div className="w-[100%] min-h-screen p-4 sm:p-6 mt-12  bg-gray-100">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3 ">
           <div className="flex items-center justify-center gap-3">
             <FaArrowLeftLong
@@ -92,7 +92,7 @@ function Courses() {
                   {course?.price ? (
                     <td className="py-3 px-4">₹{course?.price}</td>
                   ) : (
-                    <td className="py-3 px-4">₹ NA</td>
+                    <td className="py-3 px-4">₹ 0</td>
                   )}
                   <td className="py-3 px-4">
                     <span
