@@ -36,8 +36,8 @@ export const signup = async (req, res) => {
     let token = await genToken(user._id);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.status(201).json({
@@ -213,7 +213,7 @@ export const resetPassword =async(req,res)=>{
 export const googleAuth = async (req, res) => {
   try {
     const { name, email, role, photo } = req.body;
-    
+
     let user = await User.findOne({ email });
     console.log(user);
     if (!user) {
