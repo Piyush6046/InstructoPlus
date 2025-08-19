@@ -16,9 +16,10 @@ app.use(cookieParser());
 app.use(cors({
   // origin:"http://localhost:5173",
   origin:"https://instructoplus.onrender.com",
+  // origin:"https://instructo-plus.vercel.app/",
   credentials:true
 }))
-const port = process.env.PORT || 8080;
+const port = process.env.PORT;
 
 
 app.use("/api/auth",authRouter);
