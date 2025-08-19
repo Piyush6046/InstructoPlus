@@ -146,6 +146,21 @@ function ViewCourse() {
 
   const handleEnroll = async (userId, courseId) => {
     try {
+      // Check if the course is free (price is 0)
+      if (selectedCourseData?.price === 0) {
+        // Handle free course enrollment
+        const verifyRes = await axios.post(
+          serverUrl + "/api/payment/verify-free",
+          { courseId },
+          { withCredentials: true }
+        );
+        setIsEnrolled(true);
+        toast.success(verifyRes.data.message);
+        fetchUser(); // Re-fetch user data to update enrolled courses
+        return;
+      }
+
+      // Handle paid course enrollment
       const orderData = await axios.post(
         serverUrl + "/api/payment/razorpay-order",
         { courseId },
