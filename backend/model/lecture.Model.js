@@ -13,6 +13,10 @@ const lectureSchema = new mongoose.Schema(
     videoUrl: {
       type: String,
     },
+    duration: { // New field to store video duration
+      type: Number, // Duration in seconds
+      default: 0,
+    },
     isPreviewFree: {
       type: Boolean,
       default: false,

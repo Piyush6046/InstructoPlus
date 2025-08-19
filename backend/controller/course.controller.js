@@ -311,9 +311,11 @@ export const editLecuture = async (req, res) => {
     // Handle video update/removal
     if (req.files && req.files.videoUrl && req.files.videoUrl[0]) {
       const videoResult = await uploadOnCloudinary(req.files.videoUrl[0].path);
-      lecture.videoUrl = videoResult;
+      lecture.videoUrl = videoResult.url;
+      lecture.duration = videoResult.duration; // Save the duration
     } else if (removeVideo === 'true') {
       lecture.videoUrl = null;
+      lecture.duration = 0; // Reset duration if video is removed
     }
 
     // Handle document removal
@@ -400,10 +402,10 @@ export const addDocuments=async(req,res)=>{
     }
 
     const savedDocuments=documents.map(async(doc)=>{
-      const docUrl=await uploadOnCloudinary(doc.path);
+      const docResult=await uploadOnCloudinary(doc.path); // uploadOnCloudinary now returns {url, duration}
       return {
         title:doc.filename,
-        url:docUrl
+        url:docResult.url // Use the url from the result
       }
     })
 
@@ -453,4 +455,3 @@ export const getEnrolledStudents = async (req, res) => {
     });
   }
 }
-

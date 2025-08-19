@@ -444,7 +444,7 @@ function ViewCourse() {
                       <div className="flex-1">
                         <p className="font-medium">{lecture.lectureTitle}</p>
                         <p className="text-xs text-gray-500">
-                          {Math.floor(Math.random() * 10 + 5)} min
+                          {lecture.duration ? `${Math.floor(lecture.duration / 60)} min ${Math.round(lecture.duration % 60)} sec` : "N/A"}
                         </p>
                       </div>
                     </button>

@@ -33,10 +33,11 @@ const uploadOnCloudinary = async (filePath) => {
       const publicId = uploadResult.public_id;
       const originalFilename = filePath.split('\\').pop().split('/').pop();
       // Fix the URL format for document downloads - use secure_url directly
-      return uploadResult.secure_url;
+      return { url: uploadResult.secure_url, duration: null }; // Documents don't have duration
     }
 
-    return uploadResult.secure_url;
+    // For videos, return both URL and duration
+    return { url: uploadResult.secure_url, duration: uploadResult.duration };
   } catch (error) {
     console.log(error);
     if (fs.existsSync(filePath)) {

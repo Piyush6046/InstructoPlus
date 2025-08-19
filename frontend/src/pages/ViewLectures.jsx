@@ -104,7 +104,7 @@ function ViewLecture() {
                 <div className="flex items-center gap-3 text-gray-600 text-sm">
                   <span className="flex items-center gap-1">
                     <FaRegClock className="text-gray-500" />
-                    15 min
+                    {selectedLecture?.duration ? `${Math.floor(selectedLecture.duration / 60)} min ${Math.round(selectedLecture.duration % 60)} sec` : "N/A"}
                   </span>
                 </div>
               </div>
@@ -230,7 +230,7 @@ function ViewLecture() {
                           </div>
                           <div className="flex items-center gap-2 text-gray-500 text-sm mt-1">
                             <FaRegClock className="text-xs" />
-                            <span>15 min</span>
+                            <span>{lecture.duration ? `${Math.floor(lecture.duration / 60)} min ${Math.round(lecture.duration % 60)} sec` : "N/A"}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
