@@ -25,6 +25,9 @@ import Nav from './components/Nav.jsx'
 import ViewLecture from './pages/ViewLectures.jsx'
 import EnrolledCourse from './pages/EnrolledCourse.jsx'
 import getAllReviews from './customHooks/getAllReviews.jsx'
+import SearchWithAi from './pages/SearchWithAi.jsx'
+import getcourseData from './customHooks/getPublishedCourse.js'
+import EnrolledStudents from './pages/Educator/EnrolledStudents.jsx'
 
 // Animation context
 export const AnimationContext = React.createContext({
@@ -38,6 +41,8 @@ function App() {
   const {userData} = useSelector((state) => state.user);
   getCreatorCourse(); // Call the hook inside the functional component
   getAllReviews();
+  getcourseData();
+
   // Animation variants
   const animationVariants = {
     fadeIn: {
@@ -70,20 +75,22 @@ function App() {
           <Route path="" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/signup" element={!userData ? <SignUp /> : <Navigate to="/" />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/profile" element={!userData ? <Navigate to="/signup" /> : <Profile />} />
-          <Route path="/forgotpassword" element={!userData ? <Navigate to="/signup" /> : <ForgotPassword />} />
-          <Route path="/editprofile" element={!userData ? <Navigate to="/signup" /> : <EditProfile />} />
-          <Route path='/dashboard' element={userData?.user.role==="educator" ? <Dashboard/> : <Navigate to="/signup" />}/>
-          <Route path='/courses' element={userData?.user.role==="educator" ? <Courses/> : <Navigate to="/signup" />}/>
-          <Route path='/editcourses/:courseId' element={userData?.user.role==="educator" ? <EditCourse/> : <Navigate to="/signup" />}/>
-          <Route path='/createcourses' element={userData?.user.role=="educator" ? <CreateCourse/> : <Navigate to="/signup" />}/>
+          <Route path="/login" element={!userData ? <Login /> : <Navigate to="/" />} />
+          <Route path="/profile" element={!userData ? <Navigate to="/" /> : <Profile />} />
+          <Route path="/forgotpassword" element={!userData ? <Navigate to="/login" /> : <ForgotPassword />} />
+          <Route path="/editprofile" element={!userData ? <Navigate to="/login" /> : <EditProfile />} />
+          <Route path='/dashboard' element={userData?.user.role==="educator" ? <Dashboard/> : <Navigate to="/" />}/>
+          <Route path='/courses' element={userData?.user.role==="educator" ? <Courses/> : <Navigate to="/" />}/>
+          <Route path='/editcourses/:courseId' element={userData?.user.role==="educator" ? <EditCourse/> : <Navigate to="/" />}/>
+          <Route path='/createcourses' element={userData?.user.role=="educator" ? <CreateCourse/> : <Navigate to="/" />}/>
           <Route path="/allcourses" element={<AllCourses />} />
           <Route path='/createlecture/:courseId' element={userData?.user.role=="educator" ? <CreateLecture/> : <Navigate to="/signup" />}/>
           <Route path='/viewcourse/:courseId' element={<ViewCourse/>} />
           <Route path='/editlecture/:courseId/:lectureId' element={userData?.user.role==="educator" ? <EditLecture/> : <Navigate to="/signup" />} />
           <Route path='/viewlecture/:courseId' element={<ViewLecture />} />
           <Route path='/enrolledcourses/' element={userData?<EnrolledCourse/> : <Navigate to="/login" />} />
+          <Route path='/search' element={<SearchWithAi />} />
+          <Route path='/enrolledstudents/:courseId' element={<EnrolledStudents />} />
         </Routes>
       </AnimatePresence>
       <ToastContainer position="top-center" autoClose={3000} />

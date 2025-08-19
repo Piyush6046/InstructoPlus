@@ -11,8 +11,10 @@ import { motion } from 'framer-motion';
 import { AnimationContext } from '../App';
 import { useContext } from 'react';
 import Nav from '../components/Nav'
+import useGetCurrentUser from '../customHooks/getCurrentUser'
 
 function EditProfile() {
+  useGetCurrentUser();
   const { userData } = useSelector((state) => state.user);
   const [name, setName] = useState(userData?.user.name || "");
   const [description, setDescription] = useState(userData?.user.description || "");

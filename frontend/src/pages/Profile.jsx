@@ -3,8 +3,10 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import Nav from "../components/Nav";
+import useGetCurrentUser from "../customHooks/getCurrentUser";
 
 function Profile() {
+  useGetCurrentUser();
   let { userData } = useSelector((state) => state.user);
   let navigate = useNavigate();
   return (

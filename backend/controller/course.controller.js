@@ -61,7 +61,8 @@ export const getCreatorCourses = async (req, res) => {
     const userId = req.userId;
     const courses = await Course.find({ creator: userId })
       .populate("creator", "name photoUrl")
-      .populate("lectures");
+      .populate("lectures")
+      .populate("reviews")
     if (!courses) {
       return res.status(400).json({
         success: false,
@@ -109,7 +110,7 @@ export const getCoursesByCreatorId = async (req, res) => {
     const { creatorId } = req.params;
     const courses = await Course.find({ creator: creatorId, isPublished: true })
       .populate("creator", "name photoUrl")
-      .populate("lectures");
+      .populate("lectures").populate("reviews");
     if (!courses) {
       return res.status(404).json({
         success: false,
@@ -419,6 +420,37 @@ export const addDocuments=async(req,res)=>{
       message:"error while adding documents",
       error
     })
+  }
+}
+
+export const getEnrolledStudents = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+
+    // Find the course and populate enrolled students
+    const course = await Course.findById(courseId)
+      .populate({
+        path: 'enrolledStudents',
+        select: 'name email photoUrl description' // Only select necessary fields
+      });
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      enrolledStudents: course.enrolledStudents || []
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error while getting enrolled students",
+      error: error.message
+    });
   }
 }
 

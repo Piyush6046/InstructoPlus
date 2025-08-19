@@ -19,10 +19,9 @@ function Dashboard() {
   const [stats, setStats] = useState({
     totalEarnings: 0,
     totalStudents: 0,
-    totalCourses: 0,
+    publishedCourses: 0,
+    draftCourses: 0,
     enrollmentRate: 0,
-    lecturesUploaded: 0,
-    lecturesInDraft: 0,
   });
 
   const [recentCourses, setRecentCourses] = useState([]);
@@ -41,28 +40,15 @@ function Dashboard() {
       const totalStudents = courses.reduce((sum, course) =>
         sum + (course.enrolledStudents?.length || 0), 0);
 
-      const totalCourses = courses.length;
-
-      let lecturesUploaded = 0;
-      let lecturesInDraft = 0;
-
-      courses.forEach(course => {
-        course.lectures.forEach(lecture => {
-          if (lecture.isPublished) {
-            lecturesUploaded++;
-          } else {
-            lecturesInDraft++;
-          }
-        });
-      });
+      const publishedCourses = courses.filter(course => course.isPublished).length;
+      const draftCourses = courses.filter(course => !course.isPublished).length;
 
       setStats({
         totalEarnings,
         totalStudents,
-        totalCourses,
-        enrollmentRate: totalCourses > 0 ? Math.round((totalStudents / totalCourses) * 100) / 100 : 0,
-        lecturesUploaded,
-        lecturesInDraft,
+        publishedCourses,
+        draftCourses,
+        enrollmentRate: publishedCourses > 0 ? Math.round((totalStudents / publishedCourses) * 100) / 100 : 0,
       });
 
       setRecentCourses(courses.slice(0, 3));
@@ -119,17 +105,7 @@ function Dashboard() {
             </div>
             <div>
               <p className="text-gray-500 text-sm">Published Courses</p>
-              <p className="text-2xl font-bold text-gray-800">{stats.totalCourses}</p>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
-              <FaBook size={20} />
-            </div>
-            <div>
-              <p className="text-gray-500 text-sm">Lectures Uploaded</p>
-              <p className="text-2xl font-bold text-gray-800">{stats.lecturesUploaded}</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.publishedCourses}</p>
             </div>
           </div>
 
@@ -138,8 +114,8 @@ function Dashboard() {
               <FaBook size={20} />
             </div>
             <div>
-              <p className="text-gray-500 text-sm">Lectures in Draft</p>
-              <p className="text-2xl font-bold text-gray-800">{stats.lecturesInDraft}</p>
+              <p className="text-gray-500 text-sm">Draft Courses</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.draftCourses}</p>
             </div>
           </div>
 
@@ -235,14 +211,14 @@ function Dashboard() {
                     <div className="flex justify-between items-center mt-2">
                       <span className="text-indigo-600 font-semibold">₹{course.price}</span>
                       <span className="text-sm text-gray-500">
-                        {course.enrolledStudents?.length || 0} students
+                        {course?.enrolledStudents?.length || 0} students
                       </span>
                     </div>
                     <button
                       className="mt-4 w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent navigating to editcourses
-                        navigate(`/educator/enrolledstudents/${course._id}`);
+                        navigate(`/enrolledstudents/${course._id}`);
                       }}
                     >
                       Check Students

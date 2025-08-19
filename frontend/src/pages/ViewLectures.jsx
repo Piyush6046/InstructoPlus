@@ -140,9 +140,10 @@ function ViewLecture() {
                         href={document.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-1 bg-green-50 text-green-700 rounded-md text-sm hover:bg-green-100 transition"
+                        download={document.title || "document"}
+                        className="px-3 py-1 bg-green-50 text-green-700 rounded-md text-sm hover:bg-green-100 transition flex items-center gap-1"
                       >
-                        {document.title || "Document"}
+                        <span>{document.title || "Document"}</span>
                       </a>
                     ))}
                   </div>

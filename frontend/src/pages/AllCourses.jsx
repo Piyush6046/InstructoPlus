@@ -381,7 +381,7 @@ const AllCourses = () => {
               {/* AI Search Button */}
               <button
                 className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 rounded-md text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition"
-                onClick={() => navigate("/searchwithai")}
+                onClick={() => navigate("/search")}
               >
                 <img src={aiIcon} className='w-5 h-5' alt="AI Icon" />
                 Search with AI

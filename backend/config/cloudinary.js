@@ -32,7 +32,8 @@ const uploadOnCloudinary = async (filePath) => {
       const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
       const publicId = uploadResult.public_id;
       const originalFilename = filePath.split('\\').pop().split('/').pop();
-      return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment:${originalFilename}/${publicId}`;
+      // Fix the URL format for document downloads - use secure_url directly
+      return uploadResult.secure_url;
     }
 
     return uploadResult.secure_url;

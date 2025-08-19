@@ -26,11 +26,20 @@ export const verifyFreePayment = async (req, res) => {
       });
     }
 
-    if (!user.enrolledCourses.includes(courseId)) {
-      user.enrolledCourses.push(courseId);
-      await user.save();
+    // Check if user is already enrolled
+    if (user.enrolledCourses.includes(courseId)) {
+      return res.status(200).json({
+        success: true,
+        message: "You are already enrolled in this course",
+        alreadyEnrolled: true
+      });
     }
 
+    // Enroll user in course
+    user.enrolledCourses.push(courseId);
+    await user.save();
+
+    // Add user to course's enrolled students
     if (!course.enrolledStudents.includes(userId)) {
       course.enrolledStudents.push(userId);
       await course.save();
