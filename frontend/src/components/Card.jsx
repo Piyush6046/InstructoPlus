@@ -30,7 +30,10 @@ const CourseCard = ({ thumbnail, title, category, price, id, reviews, level }) =
         boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)"
       }}
       className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer h-full"
-      onClick={() => navigate(`/viewcourse/${id}`)}
+      onClick={() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        navigate(`/viewcourse/${id}`);
+      }}
     >
       <div className="relative">
         <img

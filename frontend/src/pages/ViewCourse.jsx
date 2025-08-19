@@ -29,21 +29,22 @@ function ViewCourse() {
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
-  const [showAISidebar, setShowAISidebar] = useState(false);
-  const [aiQuery, setAiQuery] = useState("");
-  const [aiResponse, setAiResponse] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
+  const [courseReviews, setCourseReviews] = useState([]); // New state for reviews
+  const [loadingReviews, setLoadingReviews] = useState(true); // State for loading reviews
+
 
   // Calculate average rating
-  const avgRating =
-    selectedCourseData?.reviews?.length > 0
-      ? (
-          selectedCourseData.reviews.reduce(
-            (sum, review) => sum + review.rating,
-            0
-          ) / selectedCourseData.reviews.length
-        ).toFixed(1)
-      : 0;
+  const avgRating = (reviews) => {
+    console.log(reviews);
+
+    // Check if reviews is undefined, null, or an empty array
+    if (!reviews || reviews.length === 0) return 0;
+
+    const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+     const avg=totalRating / reviews.length;
+     console.log("average",avg);
+     return avg.toFixed(1);
+  };
 
   // Initialize data on component mount
   useEffect(() => {
@@ -101,6 +102,28 @@ function ViewCourse() {
     fetchCreatorData();
   }, [selectedCourseData, courseId]);
 
+  // Fetch course reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      setLoadingReviews(true);
+      try {
+        // Corrected route based on reviewController.js
+        const response = await axios.get(`${serverUrl}/api/review/courseReview/${courseId}`, { withCredentials: true });
+        setCourseReviews(response.data); // Assuming response.data is the array of reviews
+        console.log("Fetched reviews:", response.data);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+        toast.error("Failed to fetch reviews.");
+      } finally {
+        setLoadingReviews(false);
+      }
+    };
+    if (courseId) {
+      fetchReviews();
+    }
+  }, [courseId]);
+
+
   // review
   const handleReview = async () => {
     try {
@@ -112,10 +135,14 @@ function ViewCourse() {
       toast.success("Review Added");
       setRating(0);
       setComment("");
+      // Refetch reviews after adding a new one
+      const response = await axios.get(`${serverUrl}/api/review/getcoursereviews/${courseId}`, { withCredentials: true });
+      setCourseReviews(response.data);
     } catch (error) {
       toast.error(error.response?.data?.message || "Error adding review");
     }
   };
+
 
   const handleEnroll = async (userId, courseId) => {
     try {
@@ -161,75 +188,10 @@ function ViewCourse() {
     }
   };
 
-  const askAIQuestion = async () => {
-    if (!aiQuery.trim()) return;
-    setAiLoading(true);
-    // Simulate API call - replace with actual Claude API integration
-    setTimeout(() => {
-      setAiResponse(
-        `Based on the course content, here's what you need to know about "${aiQuery}": This concept is covered in detail in the course materials. You can find practical examples and exercises related to this topic.`
-      );
-      setAiLoading(false);
-    }, 1500);
-  };
-
   return (
     <>
       <Nav />
       <div className="min-h-screen bg-gray-50 p-4 md:p-6 relative">
-        {/* AI Sidebar */}
-
-        {showAISidebar && (
-          <div className="fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-xl z-50 overflow-y-auto">
-            <Nav />
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-3">
-                  <FaRobot className="text-indigo-600 text-2xl" />
-                  <h2 className="text-xl font-bold">Course Assistant</h2>
-                </div>
-                <button
-                  onClick={() => setShowAISidebar(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {aiResponse && (
-                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-gray-700">{aiResponse}</p>
-                </div>
-              )}
-
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Ask about this course..."
-                  className="flex-1 p-3 border border-gray-300 rounded-lg"
-                  value={aiQuery}
-                  onChange={(e) => setAiQuery(e.target.value)}
-                  disabled={aiLoading}
-                />
-                <button
-                  onClick={askAIQuestion}
-                  className="px-4 py-3 bg-indigo-600 text-white rounded-lg"
-                  disabled={aiLoading}
-                >
-                  {aiLoading ? <ClipLoader size={16} color="white" /> : "Ask"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Floating AI Button */}
-        <button
-          onClick={() => setShowAISidebar(true)}
-          className="fixed right-6 bottom-6 bg-indigo-600 text-white p-3 rounded-full shadow-lg z-40 hover:bg-indigo-700"
-        >
-          <FaRobot className="text-xl" />
-        </button>
 
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
@@ -268,9 +230,10 @@ function ViewCourse() {
                 <div className="flex flex-wrap gap-4">
                   <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
                     <FaStar className="text-yellow-500" />
-                    <span className="font-medium">{avgRating}</span>
+                    {/* Use courseReviews for avg rating and count */}
+                    <span className="font-medium">{avgRating(courseReviews)}</span>
                     <span className="text-gray-500 ml-1">
-                      ({selectedCourseData?.reviews?.length || 0} reviews)
+                      ({courseReviews.length} reviews)
                     </span>
                   </div>
                   <div className="bg-gray-100 px-3 py-1 rounded-full text-sm">
@@ -428,51 +391,66 @@ function ViewCourse() {
             </div>
           </div>
 
-          {/* Reviews Section */}
-          <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Student Reviews</h2>
-              <div className="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-full">
-                <FaStar className="text-yellow-400" />
-                <span className="font-bold">{avgRating}</span>
-                <span className="text-gray-500">
-                  ({selectedCourseData?.reviews?.length || 0} reviews)
-                </span>
-              </div>
-            </div>
 
-            {/* Existing Reviews */}
-            <div className="space-y-6">
-              {selectedCourseData?.reviews?.slice(0, 3).map((review, index) => (
-                <div
-                  key={index}
-                  className="border-b pb-6 last:border-0 last:pb-0"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-bold">
-                      {review.user.name.charAt(0)}
-                    </div>
-                    <div>
-                      <h4 className="font-medium">{review.user.name}</h4>
-                      <div className="flex gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <FaStar
-                            key={i}
-                            className={
-                              i < review.rating
-                                ? "text-yellow-400"
-                                : "text-gray-300"
-                            }
-                          />
-                        ))}
-                      </div>
-                    </div>
+    <h2 className="text-xl font-semibold mb-2">Write a Review</h2>
+    <div className="mb-4">
+      <div className="flex gap-1 mb-2">
+        {[1, 2, 3, 4, 5].map((star) => (
+
+            <FaStar  key={star}
+            onClick={() => setRating(star)} className={star <= rating ? "fill-yellow-500" : "fill-gray-300"} />
+
+        ))}
+      </div>
+      <textarea
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        placeholder="Write your comment here..."
+        className="w-full border border-gray-300 rounded-lg p-2"
+        rows="3"
+      />
+      <button
+
+        className="bg-black text-white mt-3 px-4 py-2 rounded hover:bg-gray-800" onClick={handleReview}
+      >
+        Submit Review
+      </button>
+    </div>
+
+    {/* Display Existing Reviews */}
+    <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+      <h2 className="text-xl font-bold mb-4">Reviews</h2>
+      {loadingReviews ? (
+        <div className="flex justify-center items-center h-24">
+          <ClipLoader color="#4A90E2" size={30} />
+        </div>
+      ) : courseReviews.length === 0 ? (
+        <p className="text-gray-500">No reviews yet for this course.</p>
+      ) : (
+        <div className="space-y-4">
+          {courseReviews.map((review) => (
+            <div key={review._id} className="border-b pb-4 last:border-b-0 last:pb-0">
+              <div className="flex items-center gap-3 mb-2">
+                <img
+                  src={review.user?.photoUrl || img}
+                  alt="Reviewer"
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <div>
+                  <h3 className="font-semibold">{review.user?.name || "Anonymous"}</h3>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} className={i < review.rating ? "fill-yellow-500 w-4 h-4" : "fill-gray-300 w-4 h-4"} />
+                    ))}
                   </div>
-                  <p className="text-gray-700">{review.comment}</p>
                 </div>
-              ))}
+              </div>
+              <p className="text-gray-700">{review.comment}</p>
             </div>
-          </div>
+          ))}
+        </div>
+      )}
+    </div>
 
           {/* Other Courses by Creator */}
           {selectedCreatorCourse.length > 0 && (

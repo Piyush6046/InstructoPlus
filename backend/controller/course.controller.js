@@ -35,7 +35,8 @@ export const getPublishedCourses = async (req, res) => {
   try {
     const courses = await Course.find({ isPublished: true })
       .populate("creator", "name photoUrl")
-      .populate("lectures");
+      .populate("lectures")
+      .populate("reviews");
     if (!courses) {
       return res.status(400).json({
         success: false,

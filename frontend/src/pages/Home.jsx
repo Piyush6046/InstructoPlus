@@ -14,6 +14,7 @@ import { AnimationContext } from "../App";
 import { useContext } from "react";
 import About from "../components/About";
 import Footer from "../components/Footer";
+import ReviewPage from "../components/ReviewPage";
 
 function Home() {
   const navigate = useNavigate();
@@ -180,6 +181,7 @@ function Home() {
       <ExploreCourses />
       <Cardspage />
       <About/>
+      <ReviewPage/>
       <Footer/>
     </div>
   );

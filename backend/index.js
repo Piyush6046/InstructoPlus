@@ -7,6 +7,7 @@ import cors from "cors"
 import userRouter from "./routes/user.route.js";
 import courseRouter from "./routes/course.route.js";
 import paymentRouter from "./routes/payment.route.js";
+import reviewRouter from "./routes/reviewRoute.js";
 const app = express();
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use("/api/auth",authRouter);
 app.use("/api/user",userRouter);
 app.use("/api/course",courseRouter);
 app.use('/api/payment',paymentRouter);
+app.use("/api/review", reviewRouter)
 
 app.get("/", (req, res) => {
   res.send("Hello from backend");

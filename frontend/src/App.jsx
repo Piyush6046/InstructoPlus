@@ -24,6 +24,7 @@ import EditLecture from './pages/Educator/EditLecture.jsx'
 import Nav from './components/Nav.jsx'
 import ViewLecture from './pages/ViewLectures.jsx'
 import EnrolledCourse from './pages/EnrolledCourse.jsx'
+import getAllReviews from './customHooks/getAllReviews.jsx'
 
 // Animation context
 export const AnimationContext = React.createContext({
@@ -36,7 +37,7 @@ function App() {
   getCurrentUser();
   const {userData} = useSelector((state) => state.user);
   getCreatorCourse(); // Call the hook inside the functional component
-
+  getAllReviews();
   // Animation variants
   const animationVariants = {
     fadeIn: {
@@ -79,7 +80,7 @@ function App() {
           <Route path='/createcourses' element={userData?.user.role=="educator" ? <CreateCourse/> : <Navigate to="/signup" />}/>
           <Route path="/allcourses" element={<AllCourses />} />
           <Route path='/createlecture/:courseId' element={userData?.user.role=="educator" ? <CreateLecture/> : <Navigate to="/signup" />}/>
-          <Route path='/viewcourse/:courseId'element={userData?.user.role==="educator" ? <ViewCourse/> : <Navigate to="/signup" />} />
+          <Route path='/viewcourse/:courseId' element={<ViewCourse/>} />
           <Route path='/editlecture/:courseId/:lectureId' element={userData?.user.role==="educator" ? <EditLecture/> : <Navigate to="/signup" />} />
           <Route path='/viewlecture/:courseId' element={<ViewLecture />} />
           <Route path='/enrolledcourses/' element={userData?<EnrolledCourse/> : <Navigate to="/login" />} />
