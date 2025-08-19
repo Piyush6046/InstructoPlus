@@ -73,20 +73,20 @@ function ViewCourse() {
         console.log("ViewCourse useEffect - isEnrolled (no user data/enrolled courses):", false);
         return;
       }
-      
+
       const verify = userData.user.enrolledCourses.some((c) => {
         const enrolledId = typeof c === "string" ? c : c?._id;
         const isMatch = enrolledId?.toString() === courseId?.toString();
         console.log(`  Checking enrollment: course ${enrolledId} vs ${courseId}, Match: ${isMatch}`);
         return isMatch;
       });
-      
+
       setIsEnrolled(!!verify);
       console.log("ViewCourse useEffect - isEnrolled (after check):", !!verify);
     };
-    
+
     checkEnrollmentStatus();
-    
+
   }, [courseId, courseData, userData, dispatch]);
 
   // Fetch creator data
@@ -176,14 +176,14 @@ function ViewCourse() {
           );
           console.log("Free enrollment response:", verifyRes.data);
           setIsEnrolled(true);
-          
+
           // Check if user was already enrolled
           if (verifyRes.data.alreadyEnrolled) {
             toast.info(verifyRes.data.message);
           } else {
             toast.success(verifyRes.data.message);
           }
-          
+
           fetchUser(); // Re-fetch user data to update enrolled courses
           return;
         } catch (freeEnrollError) {
@@ -221,14 +221,6 @@ function ViewCourse() {
           handler: async function (response) {
             console.log("Razorpay Handler Response:", response);
             try {
-              // Simulate successful enrollment for testing
-              // This is a temporary fix until Razorpay integration is fully configured
-              setIsEnrolled(true);
-              toast.success("Successfully enrolled in course");
-              fetchUser(); // Re-fetch user data to update enrolled courses
-              
-              // Uncomment the below code when Razorpay is properly configured
-              /*
               const verifyRes = await axios.post(
                 serverUrl + "/api/payment/verify-payment",
                 {
@@ -243,7 +235,6 @@ function ViewCourse() {
               setIsEnrolled(true);
               toast.success(verifyRes.data.message);
               fetchUser(); // Re-fetch user data to update enrolled courses
-              */
             } catch (verifyError) {
               console.error("Payment verification error:", verifyError);
               toast.error(verifyError.response?.data?.message || "Payment verification failed.");

@@ -36,8 +36,8 @@ export const signup = async (req, res) => {
     let token = await genToken(user._id);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "None",
+      secure: true, // Set to true for HTTPS in production
+      sameSite: "None", // Required for cross-site cookies with secure: true
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.status(201).json({
@@ -75,8 +75,8 @@ export const login=async(req,res)=>{
     let token=await genToken(user._id);
     res.cookie("token",token,{
       httpOnly:true,
-      secure:true,
-      sameSite:"None",
+      secure:true, // Set to true for HTTPS in production
+      sameSite:"None", // Required for cross-site cookies with secure: true
       maxAge:7*24*60*60*1000
     })
     res.status(200).json({
@@ -241,4 +241,3 @@ export const googleAuth = async (req, res) => {
     });
   }
 }
-
