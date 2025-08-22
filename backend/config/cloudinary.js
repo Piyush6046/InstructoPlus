@@ -1,42 +1,24 @@
-import {v2 as cloudinary} from 'cloudinary'
-import dotenv from 'dotenv'
-import fs from 'fs'
-dotenv.config()
+import { v2 as cloudinary } from 'cloudinary';
+import dotenv from 'dotenv';
+import fs from 'fs';
+
+dotenv.config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 const uploadOnCloudinary = async (filePath) => {
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-  })
-
   try {
     if (!filePath) return null;
 
-    const options = {
+    const uploadResult = await cloudinary.uploader.upload(filePath, {
       resource_type: 'auto',
-    };
-
-    // Check if the file is a document (e.g., pdf, docx) to force download
-    const isDocument = /\.(pdf|docx?|txt|pptx?)$/i.test(filePath);
-    if (isDocument) {
-      options.resource_type = 'raw';
-      options.flags = 'attachment';
-    }
-
-    const uploadResult = await cloudinary.uploader.upload(filePath, options);
+    });
     fs.unlinkSync(filePath);
 
-    if (isDocument) {
-      // Manually construct the URL with the fl_attachment flag and the original filename
-      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      const publicId = uploadResult.public_id;
-      const originalFilename = filePath.split('\\').pop().split('/').pop();
-      // Fix the URL format for document downloads - use secure_url directly
-      return { url: uploadResult.secure_url, duration: null }; // Documents don't have duration
-    }
-
-    // For videos, return both URL and duration
     return { url: uploadResult.secure_url, duration: uploadResult.duration };
   } catch (error) {
     console.log(error);
@@ -45,5 +27,6 @@ const uploadOnCloudinary = async (filePath) => {
     }
     return null;
   }
-}
-export default uploadOnCloudinary
+};
+
+export default uploadOnCloudinary;

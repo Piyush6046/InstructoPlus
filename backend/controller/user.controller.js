@@ -29,7 +29,10 @@ export const updateProfile = async (req, res) => {
     const { description, name } = req.body;
     let photoUrl;
     if (req.file) {
-      photoUrl = await uploadOnCloudinary(req.file.path);
+      const uploadedPhoto = await uploadOnCloudinary(req.file.path);
+      if (uploadedPhoto && uploadedPhoto.url) {
+        photoUrl = uploadedPhoto.url;
+      }
     }
     const user = await User.findByIdAndUpdate(
       userId,
@@ -55,4 +58,3 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
-

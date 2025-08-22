@@ -142,9 +142,12 @@ export const editCourse = async (req, res) => {
       isPublished,
       price,
     } = req.body;
-    let thumbnail;
+    let thumbnail = null;
     if (req.file) {
-      thumbnail = await uploadOnCloudinary(req.file.path);
+      const uploadedThumbnail = await uploadOnCloudinary(req.file.path);
+      if (uploadedThumbnail && uploadedThumbnail.url) {
+        thumbnail = uploadedThumbnail.url;
+      }
     }
     let course = await Course.findById(courseId);
     if (!course) {
@@ -335,13 +338,13 @@ export const editLecuture = async (req, res) => {
     if (req.files && req.files.documents && documentInfos) {
       const uploadedDocuments = await Promise.all(
         req.files.documents.map(async (file, index) => {
-          const docUrl = await uploadOnCloudinary(file.path);
-          const docInfo = documentInfos[index];
-          return {
-            title: docInfo.title,
-            description: docInfo.description,
-            url: docUrl,
-          };
+            const docResult = await uploadOnCloudinary(file.path);
+            const docInfo = documentInfos[index];
+            return {
+              title: docInfo.title,
+              description: docInfo.description,
+              url: docResult.url, // Extract the URL string
+            };
         })
       );
       lecture.documents.push(...uploadedDocuments);
