@@ -36,9 +36,9 @@ function AddCourses() {
         { withCredentials: true }
       );
       setSelectedCourse(result.data.course);
-      console.log(result);
+      // console.log(result);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
   useEffect(() => {
@@ -103,7 +103,7 @@ function AddCourses() {
       navigate("/courses");
       toast.success("Course Updated");
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
@@ -123,11 +123,11 @@ function AddCourses() {
         (c) => c._id !== courseId
       );
       dispatch(setCreatorCourseData(filteredCourses));
-      console.log(result);
+      // console.log(result);
       navigate("/courses");
       setLoading1(false);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       toast.error(error.response.data.message);
       setLoading1(false);
     }

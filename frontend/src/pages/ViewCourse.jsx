@@ -29,7 +29,7 @@ function ViewCourse() {
   const fetchUser = async () => {
     await fetchUserHook();
     // After fetching user data, we'll check enrollment status again in the useEffect
-    console.log("User data refreshed after enrollment");
+    // console.log("User data refreshed after enrollment");
   };
   const [creatorData, setCreatorData] = useState(null);
   const [selectedLecture, setSelectedLecture] = useState(null);
@@ -40,19 +40,19 @@ function ViewCourse() {
   const [courseReviews, setCourseReviews] = useState([]); // New state for reviews
   const [loadingReviews, setLoadingReviews] = useState(true); // State for loading reviews
 
-  console.log("SelectedCreatorCourse", selectedCreatorCourse);
+  // console.log("SelectedCreatorCourse", selectedCreatorCourse);
 
 
   // Calculate average rating
   const avgRating = (reviews) => {
-    console.log(reviews);
+    // console.log(reviews);
 
     // Check if reviews is undefined, null, or an empty array
     if (!reviews || reviews.length === 0) return 0;
 
     const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
      const avg=totalRating / reviews.length;
-     console.log("average",avg);
+    //  console.log("average",avg);
      return avg.toFixed(1);
   };
 
@@ -63,26 +63,26 @@ function ViewCourse() {
       if (course) dispatch(setSelectedCourseData(course));
     }
 
-    console.log("ViewCourse useEffect - userData:", userData);
-    console.log("ViewCourse useEffect - courseId:", courseId);
+    // console.log("ViewCourse useEffect - userData:", userData);
+    // console.log("ViewCourse useEffect - courseId:", courseId);
 
     // Check if user is enrolled in this course
     const checkEnrollmentStatus = () => {
       if (!userData?.user?.enrolledCourses || !courseId) {
         setIsEnrolled(false);
-        console.log("ViewCourse useEffect - isEnrolled (no user data/enrolled courses):", false);
+        // console.log("ViewCourse useEffect - isEnrolled (no user data/enrolled courses):", false);
         return;
       }
 
       const verify = userData.user.enrolledCourses.some((c) => {
         const enrolledId = typeof c === "string" ? c : c?._id;
         const isMatch = enrolledId?.toString() === courseId?.toString();
-        console.log(`  Checking enrollment: course ${enrolledId} vs ${courseId}, Match: ${isMatch}`);
+        // console.log(`  Checking enrollment: course ${enrolledId} vs ${courseId}, Match: ${isMatch}`);
         return isMatch;
       });
 
       setIsEnrolled(!!verify);
-      console.log("ViewCourse useEffect - isEnrolled (after check):", !!verify);
+      // console.log("ViewCourse useEffect - isEnrolled (after check):", !!verify);
     };
 
     checkEnrollmentStatus();
@@ -128,9 +128,9 @@ function ViewCourse() {
         // Corrected route based on reviewController.js
         const response = await axios.get(`${serverUrl}/api/review/courseReview/${courseId}`, { withCredentials: true });
         setCourseReviews(response.data); // Assuming response.data is the array of reviews
-        console.log("Fetched reviews:", response.data);
+        // console.log("Fetched reviews:", response.data);
       } catch (error) {
-        console.error("Error fetching reviews:", error);
+        // console.error("Error fetching reviews:", error);
         toast.error("Failed to fetch reviews.");
       } finally {
         setLoadingReviews(false);
@@ -164,7 +164,7 @@ function ViewCourse() {
 
   const handleEnroll = async (userId, courseId) => {
     try {
-      console.log("sending request");
+      // console.log("sending request");
       // Check if the course is free (price is 0)
       if (selectedCourseData?.price === 0) {
         try {
@@ -174,7 +174,7 @@ function ViewCourse() {
             { courseId },
             { withCredentials: true }
           );
-          console.log("Free enrollment response:", verifyRes.data);
+          // console.log("Free enrollment response:", verifyRes.data);
           setIsEnrolled(true);
 
           // Check if user was already enrolled
@@ -187,7 +187,7 @@ function ViewCourse() {
           fetchUser(); // Re-fetch user data to update enrolled courses
           return;
         } catch (freeEnrollError) {
-          console.error("Free enrollment error:", freeEnrollError);
+          // console.error("Free enrollment error:", freeEnrollError);
           // Show the error message
           toast.error(freeEnrollError.response?.data?.message || "Error enrolling in free course");
           return;
@@ -200,12 +200,12 @@ function ViewCourse() {
         { courseId },
         { withCredentials: true }
       );
-      console.log("Order Data from Backend:", orderData);
-      console.log("request send");
+      // console.log("Order Data from Backend:", orderData);
+      // console.log("request send");
 
       // Check if Razorpay is available
       if (!window.Razorpay) {
-        console.error("Razorpay SDK not loaded");
+        // console.error("Razorpay SDK not loaded");
         toast.error("Payment gateway not available. Please try again later.");
         return;
       }
@@ -219,7 +219,7 @@ function ViewCourse() {
           description: "Course Enrollment Payment",
           order_id: orderData.data.order.id,
           handler: async function (response) {
-            console.log("Razorpay Handler Response:", response);
+            // console.log("Razorpay Handler Response:", response);
             try {
               const verifyRes = await axios.post(
                 serverUrl + "/api/payment/verify-payment",
@@ -231,12 +231,12 @@ function ViewCourse() {
                 },
                 { withCredentials: true }
               );
-              console.log("Payment verification response:", verifyRes.data);
+              // console.log("Payment verification response:", verifyRes.data);
               setIsEnrolled(true);
               toast.success(verifyRes.data.message);
               fetchUser(); // Re-fetch user data to update enrolled courses
             } catch (verifyError) {
-              console.error("Payment verification error:", verifyError);
+              // console.error("Payment verification error:", verifyError);
               toast.error(verifyError.response?.data?.message || "Payment verification failed.");
             }
           },
@@ -257,11 +257,11 @@ function ViewCourse() {
         const rzp = new window.Razorpay(options);
         rzp.open();
       } catch (razorpayError) {
-        console.error("Razorpay error:", razorpayError);
+        // console.error("Razorpay error:", razorpayError);
         toast.error("Payment gateway error. Please try again later.");
       }
     } catch (err) {
-      console.error("Enrollment error:", err);
+      // console.error("Enrollment error:", err);
       toast.error(err.response?.data?.message || "Something went wrong while enrolling.");
     }
   };

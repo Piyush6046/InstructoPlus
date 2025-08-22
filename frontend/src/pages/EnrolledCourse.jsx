@@ -7,7 +7,7 @@ import Nav from '../components/Nav';
 function EnrolledCourse() {
   const navigate = useNavigate();
   const { userData } = useSelector((state) => state.user);
-  console.log(userData?.user?.enrolledCourses);
+  // console.log(userData?.user?.enrolledCourses);
 
   if (!userData?.user?.enrolledCourses) {
     return (

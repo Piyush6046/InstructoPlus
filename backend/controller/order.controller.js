@@ -141,7 +141,7 @@ try {
   }
 
 } catch (error) {
-  console.error("Error in verifyPayment:", error);
+  // console.error("Error in verifyPayment:", error);
   return res.status(500).json({
     success:false,
     message:"error while verifying payment",

@@ -10,7 +10,7 @@ function ViewLecture() {
   const { courseData } = useSelector((state) => state.course);
   const { userData } = useSelector((state) => state.user);
   const selectedCourse = courseData?.find((course) => course._id === courseId);
-  console.log(selectedCourse);
+  // console.log(selectedCourse);
 
 
   const [selectedLecture, setSelectedLecture] = useState(null);
@@ -21,7 +21,7 @@ function ViewLecture() {
   useEffect(() => {
     if (selectedCourse?.lectures?.length > 0) {
       setSelectedLecture(selectedCourse.lectures[0]);
-      console.log(selectedCourse.lectures);
+      // console.log(selectedCourse.lectures);
 
     }
   }, [courseId, selectedCourse]);

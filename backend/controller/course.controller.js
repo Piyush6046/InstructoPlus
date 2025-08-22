@@ -44,13 +44,12 @@ export const getPublishedCourses = async (req, res) => {
         message: "Courses not found",
       });
     }
-    console.log("Published Courses Data:", courses); // Add this line for debugging
     return res.status(200).json({
       success: true,
       courses,
     });
   } catch (error) {
-    console.error("Error while getting published courses:", error); // Log the error
+    // console.error("Error while getting published courses:", error); // Log the error
     return res.status(500).json({
       success: false,
       message: "error while getting published courses",
@@ -358,7 +357,7 @@ export const createLectue = async (req, res) => {
       course,
     });
   } catch (error) {
-    console.error("Error while creating lecture:", error);
+    // console.error("Error while creating lecture:", error);
     return res.status(500).json({
       success: false,
       message: "Error while creating lecture",
@@ -509,7 +508,7 @@ export const editLecuture = async (req, res) => {
       lecture,
     });
   } catch (error) {
-    console.error("Error editing lecture:", error);
+    // console.error("Error editing lecture:", error);
     return res.status(500).json({
       success: false,
       message: "Error while editing lecture",

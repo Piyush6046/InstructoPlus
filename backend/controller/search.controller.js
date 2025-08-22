@@ -54,7 +54,7 @@ export const searchWithAi= async(req,res)=>{
       });
 
       keyword = response.candidates[0].content.parts[0].text.trim();
-      console.log("Generated keyword:", keyword);
+      // console.log("Generated keyword:", keyword);
     } catch (aiError) {
       console.error("Error with Gemini API:", aiError);
       // If the API call fails, use the input itself as the keyword or a random fallback keyword

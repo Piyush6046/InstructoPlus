@@ -93,9 +93,13 @@ export const fetchYoutubePlaylistDetails = async (playlistId) => {
     const videosWithDuration = await Promise.all(
       allVideos.map(async (video) => {
         const videoDetails = await fetchYoutubeVideoDetails(video.youtubeVideoId);
+        const duration = videoDetails ? videoDetails.duration : 'PT0S';
+        const durationInSeconds = parseInt(duration.replace('PT', '').replace('S', ''), 10);
+        const minutes = Math.floor(durationInSeconds / 60);
+        const seconds = durationInSeconds % 60;
         return {
           ...video,
-          duration: videoDetails ? videoDetails.duration : 'PT0S', // Default to 0 if duration not found
+          duration: `${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`,
         };
       })
     );

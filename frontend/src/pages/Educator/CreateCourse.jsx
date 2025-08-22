@@ -16,19 +16,19 @@ const CreateCourse = () => {
   const CreateCourseHandler = async () => {
     setLoading(true);
     try {
-      console.log("sending request");
+      // console.log("sending request");
       const result = await axios.post(
         serverUrl + "/api/course/create",
         { title, category },
         { withCredentials: true }
       );
-      console.log("request send");
-      console.log(result.data);
+      // console.log("request send");
+      // console.log(result.data);
       toast.success("Course Created");
       navigate("/courses");
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       setLoading(false);
       toast.error(error.response.data.message);
     }

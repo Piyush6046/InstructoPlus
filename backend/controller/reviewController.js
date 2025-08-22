@@ -53,7 +53,7 @@ export const getAllReviews = async (req, res) => {
       reviews
     );
   } catch (error) {
-    console.error("Error fetching reviews:", error);
+    // console.error("Error fetching reviews:", error);
     return res.status(500).json({ message: "Failed to fetch reviews" });
   }
 };

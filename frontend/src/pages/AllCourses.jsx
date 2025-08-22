@@ -81,7 +81,7 @@ const AllCourses = () => {
   // Initialize and apply filters when dependencies change
   useEffect(() => {
     setFilteredCourses(courseData || []);
-    console.log(courseData);
+    // console.log(courseData);
 
   }, [courseData]);
 

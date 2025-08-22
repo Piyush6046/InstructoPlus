@@ -25,9 +25,9 @@ function Courses() {
         });
 
         await dispatch(setCreatorCourseData(result.data.courses));
-        console.log(result.data);
+        // console.log(result.data);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         toast.error(error.response.data.message);
       }
     };
