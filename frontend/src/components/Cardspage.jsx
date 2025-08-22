@@ -14,10 +14,15 @@ function Cardspage() {
   const { staggerChildren } = useContext(AnimationContext);
 
   useEffect(() => {
-    if (courseData) {
+    console.log("Cardspage - courseData:", courseData); // Debugging line
+    if (courseData && courseData.length > 0) {
       setPopularCourses(courseData.slice(0, 6));
+    } else {
+      setPopularCourses([]); // Ensure it's an empty array if no data
     }
   }, [courseData]);
+
+  console.log("Cardspage - popularCourses:", popularCourses); // Debugging line
 
   return (
     <section className="py-16 bg-gradient-to-b from-indigo-50 to-white relative overflow-hidden">
@@ -48,11 +53,7 @@ function Cardspage() {
           </motion.p>
         </div>
 
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={staggerChildren}
+        <div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {popularCourses.map((course, index) => (
@@ -66,7 +67,7 @@ function Cardspage() {
               reviews={course.reviews}
             />
           ))}
-        </motion.div>
+        </div>
 
         <div className="text-center mt-12">
           <motion.button

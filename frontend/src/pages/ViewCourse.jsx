@@ -365,11 +365,22 @@ function ViewCourse() {
               <div className="bg-white rounded-xl shadow-md p-4">
                 <div className="aspect-video w-full rounded-lg overflow-hidden bg-black flex items-center justify-center">
                   {selectedLecture?.videoUrl ? (
-                    <video
-                      src={selectedLecture.videoUrl}
-                      controls
-                      className="w-full h-full object-contain"
-                    />
+                    selectedLecture.isYoutubeVideo ? (
+                      <iframe
+                        className="w-full h-full object-contain"
+                        src={selectedLecture.videoUrl}
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      ></iframe>
+                    ) : (
+                      <video
+                        src={selectedLecture.videoUrl}
+                        controls
+                        className="w-full h-full object-contain"
+                      />
+                    )
                   ) : (
                     <div className="text-center p-6 text-white">
                       <FaPlayCircle className="text-5xl mx-auto mb-4 opacity-70" />

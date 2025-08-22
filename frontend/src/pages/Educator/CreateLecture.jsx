@@ -27,10 +27,14 @@ function CreateLecture() {
     try {
       const result = await axios.post(
         serverUrl + `/api/course/createlecture/${courseId}`,
-        { lectureTitle },
+        { lectureTitle, videoUrl: lectureTitle.startsWith('http') ? lectureTitle : undefined }, // Assuming lectureTitle can be a URL
         { withCredentials: true }
       );
-      dispatch(setLectureData([...lectureData, result.data.lecture]));
+      if (result.data.lectures) { // If multiple lectures (e.g., from a playlist)
+        dispatch(setLectureData([...lectureData, ...result.data.lectures]));
+      } else if (result.data.lecture) { // If a single lecture
+        dispatch(setLectureData([...lectureData, result.data.lecture]));
+      }
       toast.success("Lecture Created");
       setLectureTitle("");
     } catch (error) {

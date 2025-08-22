@@ -15,14 +15,20 @@ import { useContext } from "react";
 import About from "../components/About";
 import Footer from "../components/Footer";
 import ReviewPage from "../components/ReviewPage";
+import useGetCurrentUser from "../customHooks/getCurrentUser";
+import getAllReviews from "../customHooks/getAllReviews";
+
 
 function Home() {
   const navigate = useNavigate();
-  getCouseData();
   const { fadeIn, slideIn } = useContext(AnimationContext);
-
+    useGetCurrentUser();
+      getCouseData();
+  getAllReviews();
   // Particle effect for background
   useEffect(() => {
+
+
     const canvas = document.createElement('canvas');
     canvas.style.position = 'absolute';
     canvas.style.top = '0';

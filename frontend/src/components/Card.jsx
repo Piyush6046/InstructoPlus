@@ -1,13 +1,13 @@
 import React from "react";
 import { FaStar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { AnimationContext } from "../App";
-import { useContext } from "react";
+// import { motion } from "framer-motion"; // Temporarily removed
+// import { AnimationContext } from "../App"; // Temporarily removed
+// import { useContext } from "react"; // Temporarily removed
 
 const CourseCard = ({ thumbnail, title, category, price, id, reviews, level }) => {
   const navigate = useNavigate();
-  const { fadeUpItem } = useContext(AnimationContext);
+  // const { fadeUpItem } = useContext(AnimationContext); // Temporarily removed
 
   const calculateAverageRating = (reviews) => {
     if (!reviews || reviews.length === 0) return 0;
@@ -23,12 +23,12 @@ const CourseCard = ({ thumbnail, title, category, price, id, reviews, level }) =
   };
 
   return (
-    <motion.div
-      variants={fadeUpItem}
-      whileHover={{
-        y: -10,
-        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)"
-      }}
+    <div
+      // variants={fadeUpItem} // Temporarily removed
+      // whileHover={{ // Temporarily removed
+      //   y: -10, // Temporarily removed
+      //   boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" // Temporarily removed
+      // }} // Temporarily removed
       className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer h-full"
       onClick={() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -65,7 +65,7 @@ const CourseCard = ({ thumbnail, title, category, price, id, reviews, level }) =
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

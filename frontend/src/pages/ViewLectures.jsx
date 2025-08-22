@@ -75,13 +75,26 @@ function ViewLecture() {
           {/* Video Player */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
             {selectedLecture?.videoUrl ? (
-              <div className="aspect-video bg-black">
-                <video
-                  src={selectedLecture.videoUrl}
-                  controls
-                  className="w-full h-full object-contain"
-                />
-              </div>
+              selectedLecture.isYoutubeVideo ? (
+                <div className="aspect-video bg-black">
+                  <iframe
+                    className="w-full h-full object-contain"
+                    src={selectedLecture.videoUrl}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              ) : (
+                <div className="aspect-video bg-black">
+                  <video
+                    src={selectedLecture.videoUrl}
+                    controls
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )
             ) : (
               <div className="aspect-video bg-gray-900 flex items-center justify-center">
                 <div className="text-center text-white p-6">

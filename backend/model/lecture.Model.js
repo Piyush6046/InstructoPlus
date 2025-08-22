@@ -14,8 +14,18 @@ const lectureSchema = new mongoose.Schema(
       type: String,
     },
     duration: { // New field to store video duration
-      type: Number, // Duration in seconds
-      default: 0,
+      type: String, // Changed to String to store ISO 8601 duration from YouTube API
+      default: 'PT0S',
+    },
+    isYoutubeVideo: {
+      type: Boolean,
+      default: false,
+    },
+    youtubeVideoId: {
+      type: String,
+    },
+    youtubePlaylistId: {
+      type: String,
     },
     isPreviewFree: {
       type: Boolean,

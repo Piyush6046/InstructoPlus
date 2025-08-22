@@ -19,7 +19,8 @@ function EditLecture() {
   const { lectureData } = useSelector(state => state.lecture);
   const dispatch = useDispatch();
   const selectedLecture = lectureData.find(lecture => lecture._id === lectureId);
-  const [videoUrl, setVideoUrl] = useState(null);
+  const [videoFile, setVideoFile] = useState(null); // For Cloudinary uploads
+  const [youtubeLink, setYoutubeLink] = useState(selectedLecture?.isYoutubeVideo ? selectedLecture.videoUrl : ""); // For YouTube links
   const [lectureTitle, setLectureTitle] = useState(selectedLecture?.lectureTitle || "");
   const [description, setDescription] = useState(selectedLecture?.description || '');
   const [documents, setDocuments] = useState(selectedLecture?.documents || []);
@@ -48,8 +49,10 @@ function EditLecture() {
   const formData = new FormData();
   formData.append("lectureTitle", lectureTitle);
   formData.append("description", description);
-  if (videoUrl) {
-    formData.append("videoUrl", videoUrl);
+  if (videoFile) {
+    formData.append("videoUrl", videoFile); // Send file for Cloudinary
+  } else if (youtubeLink) {
+    formData.append("videoUrl", youtubeLink); // Send YouTube URL
   }
   formData.append("removeVideo", removeVideo);
   formData.append("removeDocuments", JSON.stringify(removeDocuments));
@@ -174,13 +177,28 @@ function EditLecture() {
               {selectedLecture.videoUrl && !removeVideo && (
                 <div className="space-y-2">
                   <p className="text-sm text-gray-600">Current video:</p>
-                  <video
-                    src={selectedLecture.videoUrl}
-                    controls
-                    className="w-full rounded-xl"
-                  ></video>
+                  {selectedLecture.isYoutubeVideo ? (
+                    <iframe
+                      className="w-full aspect-video rounded-xl"
+                      src={selectedLecture.videoUrl}
+                      title="YouTube video player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  ) : (
+                    <video
+                      src={selectedLecture.videoUrl}
+                      controls
+                      className="w-full rounded-xl"
+                    ></video>
+                  )}
                   <button
-                    onClick={() => setRemoveVideo(true)}
+                    onClick={() => {
+                      setRemoveVideo(true);
+                      setVideoFile(null);
+                      setYoutubeLink("");
+                    }}
                     className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition text-sm flex items-center gap-2"
                   >
                     <FaTrash size={12} /> Remove Video
@@ -190,13 +208,40 @@ function EditLecture() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {selectedLecture.videoUrl && !removeVideo ? "Replace Video" : "Upload Video"}
+                  {selectedLecture.videoUrl && !removeVideo ? "Replace with YouTube URL" : "YouTube Video URL (Optional)"}
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  value={youtubeLink}
+                  onChange={(e) => {
+                    setYoutubeLink(e.target.value);
+                    setVideoFile(null); // Clear file input if YouTube link is being entered
+                    setRemoveVideo(false); // If a new link is provided, don't remove
+                  }}
+                />
+              </div>
+
+              <div className="relative flex py-5 items-center">
+                <div className="flex-grow border-t border-gray-300"></div>
+                <span className="flex-shrink mx-4 text-gray-400 text-sm">OR</span>
+                <div className="flex-grow border-t border-gray-300"></div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {selectedLecture.videoUrl && !removeVideo ? "Replace with File Upload" : "Upload Video File (Optional)"}
                 </label>
                 <input
                   type="file"
                   accept="video/*"
                   className="w-full border border-gray-300 rounded-xl p-2 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
-                  onChange={(e) => setVideoUrl(e.target.files[0])}
+                  onChange={(e) => {
+                    setVideoFile(e.target.files[0]);
+                    setYoutubeLink(""); // Clear YouTube link if file is being uploaded
+                    setRemoveVideo(false); // If a new file is provided, don't remove
+                  }}
                 />
               </div>
 

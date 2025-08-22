@@ -6,8 +6,10 @@ import { motion } from 'framer-motion';
 import Card from '../components/Card';
 import Nav from '../components/Nav';
 import aiIcon from '../assets/SearchAi.png';
+import getCouseData from '../customHooks/getPublishedCourse';
 
 const AllCourses = () => {
+  // getCouseData();
   const navigate = useNavigate();
   const { courseData } = useSelector(state => state.course);
 
