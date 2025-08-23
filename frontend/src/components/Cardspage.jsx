@@ -14,7 +14,7 @@ function Cardspage() {
   const { staggerChildren } = useContext(AnimationContext);
 
   useEffect(() => {
-    console.log("Cardspage - courseData:", courseData); // Debugging line
+    // console.log("Cardspage - courseData:", courseData); // Debugging line
     if (courseData && courseData.length > 0) {
       setPopularCourses(courseData.slice(0, 6));
     } else {
@@ -22,7 +22,7 @@ function Cardspage() {
     }
   }, [courseData]);
 
-  console.log("Cardspage - popularCourses:", popularCourses); // Debugging line
+  // console.log("Cardspage - popularCourses:", popularCourses); // Debugging line
 
   return (
     <section className="py-16 bg-gradient-to-b from-indigo-50 to-white relative overflow-hidden">

@@ -13,7 +13,7 @@ courseRouter.post("/getcreatorbyid",isAuth, getCreator)
 courseRouter.post("/editcourse/:courseId",isAuth,upload.single("thumbnail"),editCourse)
 courseRouter.get("/getcourse/:courseId",isAuth,getCourseById)
 courseRouter.delete("/remove/:courseId",isAuth,removeCourse)
-courseRouter.get("/getbycreator/:creatorId", isAuth, getCoursesByCreatorId);
+courseRouter.get("/getbycreator/:creatorId", getCoursesByCreatorId);
 
 
 // for lecture
@@ -22,7 +22,7 @@ courseRouter.get("/getlectures/:courseId",isAuth,getCourseLectures)
 courseRouter.post("/editlecture/:lectureId",isAuth,upload.fields([{ name: 'videoUrl', maxCount: 1 }, { name: 'documents' }]),editLecuture)
 courseRouter.delete("/removelecture/:lectureId",isAuth,removeLecture)
 courseRouter.post("/addDocuments/:lectureId",isAuth,upload.array("documents"),addDocuments)
-courseRouter.post("/getcreator",isAuth, getCreator)
+courseRouter.post("/getcreator", getCreator)
 
 
 // for search

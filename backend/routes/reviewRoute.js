@@ -9,6 +9,6 @@ let reviewRouter = express.Router()
 
 reviewRouter.post("/givereview",isAuth,addReview)
 reviewRouter.get("/allReview",getAllReviews)
-reviewRouter.get("/courseReview/:courseId",isAuth,getCourseReviews)
+reviewRouter.get("/courseReview/:courseId",getCourseReviews)
 
 export default reviewRouter

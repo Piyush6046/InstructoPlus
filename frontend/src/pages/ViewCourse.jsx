@@ -126,7 +126,7 @@ function ViewCourse() {
       setLoadingReviews(true);
       try {
         // Corrected route based on reviewController.js
-        const response = await axios.get(`${serverUrl}/api/review/courseReview/${courseId}`, { withCredentials: true });
+        const response = await axios.get(`${serverUrl}/api/review/courseReview/${courseId}`); // Removed withCredentials: true
         setCourseReviews(response.data); // Assuming response.data is the array of reviews
         // console.log("Fetched reviews:", response.data);
       } catch (error) {
@@ -154,7 +154,7 @@ function ViewCourse() {
       setRating(0);
       setComment("");
       // Refetch reviews after adding a new one
-      const response = await axios.get(`${serverUrl}/api/review/getcoursereviews/${courseId}`, { withCredentials: true });
+      const response = await axios.get(`${serverUrl}/api/review/courseReview/${courseId}`); // Removed withCredentials: true
       setCourseReviews(response.data);
     } catch (error) {
       toast.error(error.response?.data?.message || "Error adding review");
