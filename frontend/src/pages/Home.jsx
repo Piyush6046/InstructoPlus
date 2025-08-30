@@ -107,7 +107,6 @@ function Home() {
           alt="Students learning"
         />
 
-        <Nav />
 
         <div className="relative z-10 h-full flex flex-col justify-center items-center text-center px-4">
           <motion.h1

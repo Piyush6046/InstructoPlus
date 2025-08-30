@@ -268,6 +268,7 @@ function ViewLecture() {
             </h3>
             <div className="flex items-start gap-4">
               <img
+                onClick={() => navigate(`/user/${selectedCourse.creator?._id}`)}
                 src={selectedCourse.creator?.photoUrl || "/default-avatar.png"}
                 alt="Instructor"
                 className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"

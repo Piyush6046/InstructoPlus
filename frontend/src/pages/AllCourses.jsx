@@ -91,7 +91,6 @@ const AllCourses = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Nav />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

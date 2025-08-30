@@ -25,7 +25,6 @@ function EnrolledCourse() {
 
   return (
     <>
-      <Nav />
       <div className="min-h-screen w-full pt-20 px-4 md:px-8 lg:px-12 bg-gray-50 pb-12">
         {/* Header with back button */}
         <div className="max-w-7xl mx-auto mb-8 relative">

@@ -1,5 +1,6 @@
 import User from "../model/user.Model.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
+import Course from "../model/course.Model.js";
 
 export const getCurrentUser = async (req, res) => {
   try {
@@ -55,6 +56,46 @@ export const updateProfile = async (req, res) => {
       success: false,
       message: "error while updating profile",
       error,
+    });
+  }
+};
+
+export const getUserById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find user and populate enrolled courses
+    const user = await User.findById(userId)
+      .select("-password")
+      .populate("enrolledCourses");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // If user is an educator, find their created courses
+    let createdCourses = [];
+    if (user.role === 'educator') {
+      createdCourses = await Course.find({ creator: userId })
+        .populate('lectures')
+        .populate('reviews');
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        ...user._doc,
+        createdCourses: user.role === 'educator' ? createdCourses : undefined
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching user data",
+      error: error.message,
     });
   }
 };

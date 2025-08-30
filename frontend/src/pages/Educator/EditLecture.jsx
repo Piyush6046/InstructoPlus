@@ -121,7 +121,7 @@ function EditLecture() {
   }
 
   return (
-    <> <Nav className="sticky top-0 z-50 " />
+    <>
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
 
       <motion.div

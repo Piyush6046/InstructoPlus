@@ -8,7 +8,8 @@ const courseRouter = express.Router();
 
 courseRouter.post("/create",isAuth, createCourse);
 courseRouter.get("/getpublished",getPublishedCourses)
-courseRouter.get("/getcreator",isAuth, getCreatorCourses)
+courseRouter.get("/get-creator-course",isAuth, getCreatorCourses) // Changed route name
+courseRouter.get("/getcreator",isAuth, getCreatorCourses) // Add the route frontend expects
 courseRouter.post("/getcreatorbyid",isAuth, getCreator)
 courseRouter.post("/editcourse/:courseId",isAuth,upload.single("thumbnail"),editCourse)
 courseRouter.get("/getcourse/:courseId",isAuth,getCourseById)

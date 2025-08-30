@@ -134,7 +134,7 @@ function AddCourses() {
   };
 
   return (
-    <> <Nav className="sticky top-0 z-50 " />
+    <>
     <div className="max-w-5xl mx-auto p-6  bg-white rounded-lg shadow-md">
       {/* Top Bar */}
 

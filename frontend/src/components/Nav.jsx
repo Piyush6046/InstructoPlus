@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import logo from "../assets/logo.jpg";
-import { IoMdPerson } from "react-icons/io";
+import { IoMdPerson, IoMdAdd, IoMdNotifications } from "react-icons/io";
 import { GiHamburgerMenu, GiSplitCross } from "react-icons/gi";
 import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../App";
@@ -15,17 +15,97 @@ import { useContext } from "react";
 function Nav() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
+  const [showAddDropdown, setShowAddDropdown] = useState(false);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+  const [notifications, setNotifications] = useState([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.user);
   const profileRef = useRef(null);
+  const notificationRef = useRef(null);
+  const addRef = useRef(null);
   const { fadeIn } = useContext(AnimationContext);
 
-  // Close dropdown when clicking outside
+  // Fetch unread notification count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (userData) {
+        try {
+          const response = await axios.get(`${serverUrl}/api/notifications/unread/count`, {
+            withCredentials: true,
+          });
+          setUnreadNotificationCount(response.data.count);
+        } catch (error) {
+          console.error("Failed to fetch unread notification count:", error);
+        }
+      }
+    };
+
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 60000); // Refresh every minute
+    return () => clearInterval(interval);
+  }, [userData]);
+
+  // Fetch notifications when dropdown is opened
+  const fetchNotifications = async () => {
+    if (!userData || loadingNotifications) return;
+
+    setLoadingNotifications(true);
+    try {
+      const response = await axios.get(`${serverUrl}/api/notifications`, {
+        withCredentials: true,
+      });
+      setNotifications(response.data.notifications || []);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+      toast.error("Failed to load notifications");
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
+
+  // Mark notification as read
+  const markAsRead = async (notificationId) => {
+    try {
+      await axios.put(`${serverUrl}/api/notifications/${notificationId}/read`, {}, {
+        withCredentials: true,
+      });
+
+      // Update local state
+      setNotifications(prev =>
+        prev.map(notif =>
+          notif._id === notificationId ? { ...notif, isRead: true } : notif
+        )
+      );
+
+      // Update unread count
+      setUnreadNotificationCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+    }
+  };
+
+  // Handle notification click
+  const handleNotificationClick = () => {
+    setShowNotificationDropdown(!showNotificationDropdown);
+    if (!showNotificationDropdown) {
+      fetchNotifications();
+    }
+  };
+
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfileMenu(false);
+      }
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotificationDropdown(false);
+      }
+      if (addRef.current && !addRef.current.contains(event.target)) {
+        setShowAddDropdown(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -55,10 +135,33 @@ function Nav() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.2 } }
   };
 
+  const notificationDropdownVariants = {
+    hidden: { opacity: 0, y: -20, scale: 0.95 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" } }
+  };
+
   const mobileMenuVariants = {
     hidden: { x: "100%" },
     visible: { x: 0, transition: { duration: 0.3 } },
     exit: { x: "100%" }
+  };
+
+  // Format notification time
+  const formatNotificationTime = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now - date;
+    const diffInHours = diffInMs / (1000 * 60 * 60);
+
+    if (diffInHours < 1) {
+      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+      return `${diffInMinutes}m ago`;
+    } else if (diffInHours < 24) {
+      return `${Math.floor(diffInHours)}h ago`;
+    } else {
+      const diffInDays = Math.floor(diffInHours / 24);
+      return `${diffInDays}d ago`;
+    }
   };
 
   return (
@@ -85,6 +188,172 @@ function Nav() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
+            {userData && userData?.user?.role === "educator" && (
+              <div className="relative" ref={addRef}>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowAddDropdown(!showAddDropdown)}
+                  className="p-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none flex items-center justify-center h-10 w-10"
+                  title="Add New"
+                >
+                  <IoMdAdd className="h-5 w-5" />
+                </motion.button>
+
+                {/* Add Dropdown Menu */}
+                <AnimatePresence>
+                  {showAddDropdown && (
+                    <motion.div
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                      className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+                    >
+                      <button
+                        onClick={() => {
+                          navigate("/educator/create-announcement");
+                          setShowAddDropdown(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        New Announcement
+                      </button>
+                      <button
+                        onClick={() => {
+                          navigate("/createcourses");
+                          setShowAddDropdown(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        New Course
+                      </button>
+                      <button
+                        onClick={() => {
+                          navigate("/courses");
+                          setShowAddDropdown(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Add Lecture
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            {userData && (
+              <div className="relative" ref={notificationRef}>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleNotificationClick}
+                  className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 focus:outline-none relative"
+                  title="Notifications"
+                >
+                  <IoMdNotifications className="h-6 w-6" />
+                  {unreadNotificationCount > 0 && (
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                      {unreadNotificationCount}
+                    </span>
+                  )}
+                </motion.button>
+
+                {/* Notification Dropdown */}
+                <AnimatePresence>
+                  {showNotificationDropdown && (
+                    <motion.div
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={notificationDropdownVariants}
+                      className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden"
+                    >
+                      <div className="p-4 border-b border-gray-200">
+                        <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+                      </div>
+
+                      <div className="max-h-80 overflow-y-auto">
+                        {loadingNotifications ? (
+                          <div className="p-4 text-center">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
+                            <p className="text-sm text-gray-500 mt-2">Loading notifications...</p>
+                          </div>
+                        ) : notifications.length === 0 ? (
+                          <div className="p-4 text-center text-gray-500">
+                            <IoMdNotifications className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                            <p className="text-sm">No notifications yet</p>
+                          </div>
+                        ) : (
+                          notifications.map((notification) => (
+                            <motion.div
+                              key={notification._id}
+                              whileHover={{ backgroundColor: "#f9fafb" }}
+                              onClick={() => {
+                                if (notification.announcementId) {
+                                  navigate(`/announcements/${notification.announcementId._id}`);
+                                }
+                                markAsRead(notification._id)}}
+                              className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${
+                                !notification.isRead ? 'bg-blue-50' : ''
+                              }`}
+                            >
+                              <div className="flex items-start space-x-3">
+                                <div className="flex-shrink-0">
+                                  {notification.announcementId?.sender?.photoUrl ? (
+                                    <img
+                                      src={notification.announcementId.sender.photoUrl}
+                                      className="h-8 w-8 rounded-full"
+                                      alt="Sender"
+                                    />
+                                  ) : (
+                                    <div className="h-8 w-8 rounded-full bg-indigo-500 text-white flex items-center justify-center text-sm font-medium">
+                                      {notification.announcementId?.sender?.name?.charAt(0) || 'A'}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                    {notification.announcementId?.title || 'New Announcement'}
+                                  </p>
+                                  <p className="text-sm text-gray-500 line-clamp-2">
+                                    {notification.announcementId?.description || 'No description available'}
+                                  </p>
+                                  <p className="text-xs text-gray-400 mt-1">
+                                    {formatNotificationTime(notification.createdAt)}
+                                  </p>
+                                </div>
+                                {!notification.isRead && (
+                                  <div className="flex-shrink-0">
+                                    <div className="h-2 w-2 bg-blue-600 rounded-full"></div>
+                                  </div>
+                                )}
+                              </div>
+                            </motion.div>
+                          ))
+                        )}
+                      </div>
+
+                      {notifications.length > 0 && (
+                        <div className="p-3 border-t border-gray-200 bg-gray-50">
+                          <button
+                            onClick={() => {
+                              navigate("/notifications");
+                              setShowNotificationDropdown(false);
+                            }}
+                            className="w-full text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                          >
+                            View all notifications
+                          </button>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
             {userData && (
               <div className="relative" ref={profileRef}>
                 <motion.button
@@ -250,6 +519,34 @@ function Nav() {
                     transition={{ delay: 0.2 }}
                     className="space-y-4"
                   >
+                    {userData?.user?.role === "educator" && (
+                      <motion.button
+                        whileHover={{ x: 10 }}
+                        onClick={() => {
+                          navigate("/educator/create-announcement");
+                          setShowMobileMenu(false);
+                        }}
+                        className="w-full text-left px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md flex items-center"
+                      >
+                        <IoMdAdd className="h-5 w-5 mr-3 text-indigo-600" />
+                        Send Announcement
+                      </motion.button>
+                    )}
+                    {userData && (
+                      <motion.button
+                        whileHover={{ x: 10 }}
+                        onClick={handleNotificationClick}
+                        className="w-full text-left px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md flex items-center relative"
+                      >
+                        <IoMdNotifications className="h-5 w-5 mr-3 text-indigo-600" />
+                        Notifications
+                        {unreadNotificationCount > 0 && (
+                          <span className="absolute right-4 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                            {unreadNotificationCount}
+                          </span>
+                        )}
+                      </motion.button>
+                    )}
                     <motion.button
                       whileHover={{ x: 10 }}
                       onClick={() => {

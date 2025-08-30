@@ -60,7 +60,7 @@ function EditProfile() {
   }
 
   return (
-    <> <Nav />
+    <> 
     <motion.div
       className="min-h-screen flex items-center justify-center bg-gray-100 p-4"
       variants={fadeIn}

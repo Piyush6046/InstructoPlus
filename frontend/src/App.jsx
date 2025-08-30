@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import getCurrentUser from './customHooks/getCurrentUser.js'
 import { useSelector } from 'react-redux'
 import Profile from './pages/Profile.jsx'
+import UserProfile from './pages/UserProfile.jsx'
 import ForgotPassword from "./pages/ForgotPassword.jsx"
 import EditProfile from './pages/EditProfile.jsx'
 import EditCourse from './pages/Educator/EditCourse.jsx'
@@ -30,6 +31,10 @@ import getAllReviews from './customHooks/getAllReviews.jsx'
 import SearchWithAi from './pages/SearchWithAi.jsx'
 import getcourseData from './customHooks/getPublishedCourse.js'
 import EnrolledStudents from './pages/Educator/EnrolledStudents.jsx'
+import CreateAnnouncement from './pages/Educator/CreateAnnouncement.jsx'
+import AllNotificationsPage from './pages/AllNotificationsPage.jsx' // Import AllNotificationsPage
+import AnnouncementDetail from './pages/AnnouncementDetail.jsx' // Import AnnouncementDetail
+
 
 // Animation context
 export const AnimationContext = React.createContext({
@@ -72,32 +77,41 @@ function App() {
 
   return (
     <AnimationContext.Provider value={animationVariants}>
-      <AnimatePresence mode="wait">
-        <Routes>
-          <Route path="" element={<Home />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/signup" element={!userData ? <SignUp /> : <Navigate to="/" />} />
-          <Route path="/login" element={!userData ? <Login /> : <Navigate to="/" />} />
-          <Route path="/profile" element={!userData ? <Navigate to="/" /> : <Profile />} />
-          <Route path="/forgotpassword" element={!userData ? <Navigate to="/login" /> : <ForgotPassword />} />
-          <Route path="/editprofile" element={!userData ? <Navigate to="/login" /> : <EditProfile />} />
-          <Route path='/dashboard' element={userData?.user.role==="educator" ? <Dashboard/> : <Navigate to="/" />}/>
-          <Route path='/courses' element={userData?.user.role==="educator" ? <Courses/> : <Navigate to="/" />}/>
-          <Route path='/editcourses/:courseId' element={userData?.user.role==="educator" ? <EditCourse/> : <Navigate to="/" />}/>
-          <Route path='/createcourses' element={userData?.user.role=="educator" ? <CreateCourse/> : <Navigate to="/" />}/>
-          <Route path="/allcourses" element={<AllCourses />} />
-          <Route path='/createlecture/:courseId' element={userData?.user.role=="educator" ? <CreateLecture/> : <Navigate to="/signup" />}/>
-          <Route path='/viewcourse/:courseId' element={<ViewCourse/>} />
-          <Route path='/editlecture/:courseId/:lectureId' element={userData?.user.role==="educator" ? <EditLecture/> : <Navigate to="/signup" />} />
-          <Route path='/viewlecture/:courseId' element={<ViewLecture />} />
-          <Route path='/enrolledcourses/' element={userData?<EnrolledCourse/> : <Navigate to="/login" />} />
-          <Route path='/search' element={<SearchWithAi />} />
-          <Route path='/enrolledstudents/:courseId' element={<EnrolledStudents />} />
-        </Routes>
-      </AnimatePresence>
-      <ToastContainer position="top-center" autoClose={3000} />
+      <div className="min-h-screen flex flex-col">
+        <Nav />
+        <main className="flex-grow pt-16">
+          <AnimatePresence mode="wait">
+            <Routes>
+              <Route path="" element={<Home />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/signup" element={!userData ? <SignUp /> : <Navigate to="/" />} />
+              <Route path="/login" element={!userData ? <Login /> : <Navigate to="/" />} />
+              <Route path="/profile" element={!userData ? <Navigate to="/" /> : <Profile />} />
+              <Route path="/user/:userId" element={<UserProfile />} />
+              <Route path="/forgotpassword" element={!userData ? <Navigate to="/login" /> : <ForgotPassword />} />
+              <Route path="/editprofile" element={!userData ? <Navigate to="/login" /> : <EditProfile />} />
+              <Route path="/dashboard" element={userData && userData.user && userData.user.role==="educator" ? <Dashboard/> : <Navigate to="/" />}/>
+              <Route path="/courses" element={userData && userData.user && userData.user.role==="educator" ? <Courses/> : <Navigate to="/" />}/>
+              <Route path="/editcourses/:courseId" element={userData && userData.user && userData.user.role==="educator" ? <EditCourse/> : <Navigate to="/" />}/>
+              <Route path="/createcourses" element={userData && userData.user && userData.user.role==="educator" ? <CreateCourse/> : <Navigate to="/" />}/>
+              <Route path="/allcourses" element={<AllCourses />} />
+              <Route path="/createlecture/:courseId" element={userData && userData.user && userData.user.role==="educator" ? <CreateLecture/> : <Navigate to="/signup" />}/>
+              <Route path="/educator/create-announcement" element={userData && userData.user && userData.user.role==="educator" ? <CreateAnnouncement/> : <Navigate to="/" />}/>
+              <Route path="/viewcourse/:courseId" element={<ViewCourse/>} />
+              <Route path="/editlecture/:courseId/:lectureId" element={userData && userData.user && userData.user.role==="educator" ? <EditLecture/> : <Navigate to="/signup" />} />
+              <Route path="/viewlecture/:courseId" element={<ViewLecture />} />
+              <Route path="/enrolledcourses/" element={userData?<EnrolledCourse/> : <Navigate to="/login" />} />
+              <Route path="/search-with-ai" element={userData ? <SearchWithAi /> : <Navigate to="/login" />} />
+              <Route path="/notifications" element={<AllNotificationsPage />} />
+              <Route path="/announcement/:id" element={<AnnouncementDetail />} />
+              <Route path="/enrolledstudents/:courseId" element={userData && userData.user && userData.user.role==="educator" ? <EnrolledStudents /> : <Navigate to="/" />} />
+            </Routes>
+          </AnimatePresence>
+        </main>
+      </div>
+      <ToastContainer position="bottom-right" autoClose={3000} />
     </AnimationContext.Provider>
-  )
+  );
 }
 
 export default App

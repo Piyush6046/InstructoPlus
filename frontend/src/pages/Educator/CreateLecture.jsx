@@ -62,7 +62,7 @@ function CreateLecture() {
   }, [courseId]);
 
   return (
-    <><Nav classname="sticky top-0 z-50 pb-10" />
+    <>
     <div className="min-h-screen bg-gray-100 pt-20 flex items-center justify-center p-4">
 
       <motion.div

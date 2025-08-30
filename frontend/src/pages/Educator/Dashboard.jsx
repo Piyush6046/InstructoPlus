@@ -59,7 +59,7 @@ function Dashboard() {
   }, [creatorCourseData]);
 
   return (
-    <><Nav />
+    <>
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50 p-6">
 
 

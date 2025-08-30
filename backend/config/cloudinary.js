@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
-import fs from 'fs';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 dotenv.config();
 
@@ -11,21 +12,50 @@ cloudinary.config({
 });
 
 const uploadOnCloudinary = async (filePath) => {
-  try {
-    if (!filePath) return null;
+  if (!filePath) return null;
 
+  try {
+    // Upload file to Cloudinary
     const uploadResult = await cloudinary.uploader.upload(filePath, {
       resource_type: 'auto',
     });
-    fs.unlinkSync(filePath);
 
-    return { url: uploadResult.secure_url, duration: uploadResult.duration };
-  } catch (error) {
-    console.log(error);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    // After successful upload, delete the temp file
+    try {
+      await fs.unlink(filePath);
+    } catch (unlinkError) {
+      console.error('Error deleting temporary file after upload:', unlinkError);
+      // Continue even if file deletion fails, as the upload was successful
     }
+
+    return {
+      url: uploadResult.secure_url,
+      duration: uploadResult.duration,
+      public_id: uploadResult.public_id // Return public_id for future reference
+    };
+  } catch (error) {
+    console.error('Error uploading to Cloudinary:', error);
+
+    // Clean up temp file in case of upload error
+    try {
+      if (await fileExists(filePath)) {
+        await fs.unlink(filePath);
+      }
+    } catch (cleanupError) {
+      console.error('Error cleaning up file after failed upload:', cleanupError);
+    }
+
     return null;
+  }
+};
+
+// Helper function to check if file exists
+const fileExists = async (filePath) => {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
   }
 };
 

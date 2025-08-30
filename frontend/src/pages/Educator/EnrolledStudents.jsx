@@ -28,9 +28,13 @@ function EnrolledStudents() {
     getEnrolledStudents();
   }, [courseId]);
 
+  const handleStudentClick = (studentId) => {
+    navigate(`/user/${studentId}`);
+  };
+
   return (
     <>
-      <Nav />
+   
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
@@ -77,7 +81,11 @@ function EnrolledStudents() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {students.map((student) => (
-                        <tr key={student._id} className="hover:bg-gray-50">
+                        <tr
+                          key={student._id}
+                          className="hover:bg-gray-50 cursor-pointer transition-colors"
+                          onClick={() => handleStudentClick(student._id)}
+                        >
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div className="flex-shrink-0 h-10 w-10">
@@ -90,7 +98,9 @@ function EnrolledStudents() {
                                 )}
                               </div>
                               <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">{student.name}</div>
+                                <div className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors">
+                                  {student.name}
+                                </div>
                               </div>
                             </div>
                           </td>
