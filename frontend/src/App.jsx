@@ -103,7 +103,7 @@ function App() {
               <Route path="/enrolledcourses/" element={userData?<EnrolledCourse/> : <Navigate to="/login" />} />
               <Route path="/search-with-ai" element={userData ? <SearchWithAi /> : <Navigate to="/login" />} />
               <Route path="/notifications" element={<AllNotificationsPage />} />
-              <Route path="/announcement/:id" element={<AnnouncementDetail />} />
+              <Route path="/announcements/:id" element={<AnnouncementDetail />} />
               <Route path="/enrolledstudents/:courseId" element={userData && userData.user && userData.user.role==="educator" ? <EnrolledStudents /> : <Navigate to="/" />} />
             </Routes>
           </AnimatePresence>

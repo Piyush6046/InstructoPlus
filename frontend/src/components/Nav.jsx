@@ -95,6 +95,12 @@ function Nav() {
     }
   };
 
+  // Handle view all notifications
+  const handleViewAllNotifications = () => {
+    navigate("/notifications");
+    setShowNotificationDropdown(false);
+  };
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -248,7 +254,12 @@ function Nav() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={handleNotificationClick}
+                  onClick={() => {
+                    setShowNotificationDropdown(!showNotificationDropdown);
+                    if (!showNotificationDropdown) {
+                      fetchNotifications();
+                    }
+                  }}
                   className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 focus:outline-none relative"
                   title="Notifications"
                 >
@@ -268,13 +279,14 @@ function Nav() {
                       animate="visible"
                       exit="hidden"
                       variants={notificationDropdownVariants}
-                      className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden"
+                      className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 flex flex-col"
+                      style={{ maxHeight: '24rem' }}
                     >
                       <div className="p-4 border-b border-gray-200">
                         <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
                       </div>
 
-                      <div className="max-h-80 overflow-y-auto">
+                      <div className="flex-1 overflow-y-auto">
                         {loadingNotifications ? (
                           <div className="p-4 text-center">
                             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
@@ -335,19 +347,19 @@ function Nav() {
                         )}
                       </div>
 
-                      {notifications.length > 0 && (
-                        <div className="p-3 border-t border-gray-200 bg-gray-50">
-                          <button
-                            onClick={() => {
-                              navigate("/notifications");
-                              setShowNotificationDropdown(false);
-                            }}
-                            className="w-full text-sm text-indigo-600 hover:text-indigo-800 font-medium"
-                          >
-                            View all notifications
-                          </button>
-                        </div>
-                      )}
+                      {/* Always show View All button */}
+                      <div className="sticky bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-200">
+                        <button
+                          onClick={handleViewAllNotifications}
+                          className={`w-full py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                            notifications.length === 0
+                              ? 'text-gray-600 bg-gray-100 hover:bg-gray-200'
+                              : 'text-white bg-indigo-600 hover:bg-indigo-700'
+                          }`}
+                        >
+                          View all notifications
+                        </button>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
