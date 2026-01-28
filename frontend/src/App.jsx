@@ -88,7 +88,7 @@ function App() {
               <Route path="/login" element={!userData ? <Login /> : <Navigate to="/" />} />
               <Route path="/profile" element={!userData ? <Navigate to="/" /> : <Profile />} />
               <Route path="/user/:userId" element={<UserProfile />} />
-              <Route path="/forgotpassword" element={!userData ? <Navigate to="/login" /> : <ForgotPassword />} />
+              <Route path="/forgotpassword" element={<ForgotPassword />} />
               <Route path="/editprofile" element={!userData ? <Navigate to="/login" /> : <EditProfile />} />
               <Route path="/dashboard" element={userData && userData.user && userData.user.role==="educator" ? <Dashboard/> : <Navigate to="/" />}/>
               <Route path="/courses" element={userData && userData.user && userData.user.role==="educator" ? <Courses/> : <Navigate to="/" />}/>
@@ -101,7 +101,7 @@ function App() {
               <Route path="/editlecture/:courseId/:lectureId" element={userData && userData.user && userData.user.role==="educator" ? <EditLecture/> : <Navigate to="/signup" />} />
               <Route path="/viewlecture/:courseId" element={<ViewLecture />} />
               <Route path="/enrolledcourses/" element={userData?<EnrolledCourse/> : <Navigate to="/login" />} />
-              <Route path="/search-with-ai" element={userData ? <SearchWithAi /> : <Navigate to="/login" />} />
+              <Route path="/search" element={userData ? <SearchWithAi /> : <Navigate to="/login" />} />
               <Route path="/notifications" element={<AllNotificationsPage />} />
               <Route path="/announcements/:id" element={<AnnouncementDetail />} />
               <Route path="/enrolledstudents/:courseId" element={userData && userData.user && userData.user.role==="educator" ? <EnrolledStudents /> : <Navigate to="/" />} />
