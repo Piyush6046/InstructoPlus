@@ -16,6 +16,7 @@ dotenv.config();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
+  https://instructo-plus2.vercel.app/,
   // origin:"http://localhost:5173",
   origin:"https://instructoplus.onrender.com",
   // origin:"https://instructo-plus.vercel.app/",
